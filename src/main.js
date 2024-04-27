@@ -40,7 +40,6 @@ autoUpdater.on("update-downloaded", (info) => {
 
 async function checkForUpdates() {
   await autoUpdater.checkForUpdates();
-  autoUpdater.checkForUpdatesAndNotify();
 }
 
 function createWindow() {
