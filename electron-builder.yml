@@ -14,4 +14,4 @@ publish:
   - provider: github
     owner: irrvlo
     repo: juice-client
-    releaseType: release
+    releaseType: draft
