@@ -4,10 +4,7 @@ const { autoUpdater } = require("electron-updater");
 const shortcut = require("electron-localshortcut");
 const path = require("path");
 
-let startTimestamp = new Date();
-const rpc = require("discord-rpc");
-const client = new rpc.Client({ transport: "ipc" });
-client.login({ clientId: "1233829658345078846" }).catch(console.error);
+new (require('./rpc'))()
 
 app.commandLine.appendSwitch("disable-frame-rate-limit");
 app.commandLine.appendSwitch("disable-gpu-vsync");
@@ -98,17 +95,6 @@ function createWindow() {
 
 app.on("ready", async () => {
   checkForUpdates();
-  client.on("ready", () => {
-    client.setActivity({
-      startTimestamp,
-      largeImageKey: "juicer",
-      largeImageText: "Juice Client",
-      buttons: [
-        { label: "Download", url: "https://juice.irrvlo.xyz" },
-        { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },
-      ],
-    });
-  });
   createWindow();
 });
 
