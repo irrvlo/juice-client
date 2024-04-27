@@ -1,0 +1,23 @@
+{
+  "name": "juice-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "irrvlo",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.4.7",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "discord-rpc": "^4.0.1",
+    "electron-localshortcut": "^3.2.1",
+    "electron-updater": "^6.1.8",
+    "v8-compile-cache": "^2.4.0"
+  }
+}

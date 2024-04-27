@@ -1,0 +1,17 @@
+appId: xyz.irrvlo.juice
+productName: Juice Client
+directories:
+  output: "build"
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+  icon: "src/assets/icon.ico"
+  artifactName: "${name}-setup-win-${arch}-${version}.${ext}"
+publish:
+  - provider: github
+    owner: irrvlo
+    repo: juice-client
+    releaseType: release
