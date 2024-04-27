@@ -1,28 +1,53 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Build
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
 
-    runs-on: windows-latest
+    permissions:
+      contents: write
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        os: [windows-latest]
+        include:
+          - os: windows-latest
+            arch: x64
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build 
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.15.0'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Get version and name from package.json
+        id: get_version_name
+        run: |
+          echo "::set-output name=version::$(node -p "require('./package.json').version")"
+          echo "::set-output name=name::$(node -p "require('./package.json').name")"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version_name.outputs.version }}
+          release_name: Release ${{ steps.get_version_name.outputs.version }}
+          draft: true
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron App
+        run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
