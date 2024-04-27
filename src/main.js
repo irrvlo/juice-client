@@ -1,10 +1,10 @@
 require("v8-compile-cache");
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow, dialog, clipboard } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const shortcut = require("electron-localshortcut");
 const path = require("path");
 
-new (require('./rpc'))()
+new (require("./rpc"))();
 
 app.commandLine.appendSwitch("disable-frame-rate-limit");
 app.commandLine.appendSwitch("disable-gpu-vsync");
@@ -51,6 +51,7 @@ function createWindow() {
     height: 720,
     webPreferences: {
       nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
@@ -74,6 +75,11 @@ function createWindow() {
 
   registerShortcut("F5", () => {
     win.reload();
+  });
+
+  registerShortcut("F6", () => {
+    win.loadURL(clipboard.readText());
+
   });
 
   registerShortcut("Ctrl+R", () => {
