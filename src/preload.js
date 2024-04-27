@@ -26,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
         container.querySelector(".play-content-up")
       );
     } else {
-      console.error("Element with 'play-content' not found.");
+      console.error("Element with class 'play-content' not found.");
     }
   };
 
   new MutationObserver(() => {
-	joinUsingURL();
+    joinUsingURL();
   }).observe(document.body, {
-	childList: true,
-	subtree: true,
+    childList: true,
+    subtree: true,
   });
 });
