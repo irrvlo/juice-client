@@ -1,10 +1,11 @@
 require("v8-compile-cache");
-const { app, BrowserWindow, dialog, clipboard } = require("electron");
+const { app, BrowserWindow, dialog, clipboard, protocol } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const { applySwitches } = require("./switches");
 const Store = require("electron-store");
 const shortcut = require("electron-localshortcut");
 const path = require("path");
+const initResourceSwapper = require("./swapper");
 
 const store = new Store();
 
@@ -90,6 +91,16 @@ async function checkForUpdates() {
   await autoUpdater.checkForUpdates();
 }
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "juiceclient",
+    privileges: {
+      secure: true,
+      corsEnabled: true,
+    },
+  },
+]);
+
 function createWindow() {
   let win = new BrowserWindow({
     fullscreen: settings.auto_fullscreen,
@@ -123,6 +134,7 @@ function createWindow() {
 }
 
 app.on("ready", async () => {
+  initResourceSwapper();
   checkForUpdates();
   createWindow();
 });

@@ -49,6 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const handleKeyDown = (e) => {
       if (e.code === settings.menu_keybind) {
         const isActive = menuToggle.getAttribute("data-active") === "true";
+        if (!isActive) {
+          document.exitPointerLock();
+        }
         menuToggle.setAttribute("data-active", !isActive);
         localStorage.setItem("juice-menu", !isActive);
       }
@@ -220,36 +223,18 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const loadTheme = () => {
-    const loadCSS = (url, id) => {
-      const head = document.querySelector("head");
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = url;
-      link.id = id;
-      head.appendChild(link);
-    };
-
-    const updateCSS = (url, id) => {
-      const link = document.getElementById(id);
-      if (link) {
-        link.href = url;
-      }
-    };
-
-    loadCSS("", "juice-theme");
+    const addedStyles = document.createElement("style");
+    addedStyles.id = "juice-styles-theme";
+    document.head.appendChild(addedStyles);
 
     const updateTheme = () => {
       const settings = store.get("settings");
-      const themeLink = document.getElementById("juice-theme");
+      const cssLink = settings.css_link;
 
-      if (
-        settings.css_link !== "" &&
-        settings.css_link.startsWith("http") &&
-        settings.css_link.endsWith(".css")
-      ) {
-        updateCSS(settings.css_link, "juice-theme");
+      if (cssLink) {
+        addedStyles.innerHTML = `@import url('${cssLink}');`;
       } else {
-        themeLink && themeLink.remove();
+        addedStyles.innerHTML = "";
       }
     };
 
