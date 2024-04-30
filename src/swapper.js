@@ -37,7 +37,7 @@ const initResourceSwapper = () => {
       if (fs.statSync(filePath).isDirectory()) allFilesSync(filePath);
       else {
         const useAssets =
-          /JuiceClient\\swapper\\assets\\(css|media|img)\\.*\.(.{4})/.test(
+          /JuiceClient\\swapper\\assets\\(css|media|img|glb)\\.*\.(.{4})/.test(
             filePath
           );
         if (!useAssets) return;
