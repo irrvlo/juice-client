@@ -1,14 +1,61 @@
 require("v8-compile-cache");
 const { app, BrowserWindow, dialog, clipboard } = require("electron");
 const { autoUpdater } = require("electron-updater");
+const { applySwitches } = require("./switches");
+const Store = require("electron-store");
 const shortcut = require("electron-localshortcut");
 const path = require("path");
 
-new (require("./rpc"))();
+const store = new Store();
 
-app.commandLine.appendSwitch("disable-frame-rate-limit");
-app.commandLine.appendSwitch("disable-gpu-vsync");
+const defaultSettings = {
+  perm_crosshair: true,
+  hitmarker_link: "",
+  ui_animations: true,
+  hide_chat: false,
+  hide_interface: false,
+  skip_loading: false,
+  interface_opacity: "100",
+  interface_bounds: "2",
+  rave_mode: false,
+  unlimited_fps: false,
+  auto_fullscreen: true,
+  discord_rpc: true,
+  css_link: "",
+  experimental_flags: false,
+  low_latency: false,
+  increase_limits: false,
+  helpful_flags: false,
+  remove_useless_features: false,
+  in_process_gpu: false,
+  gpu_rasterization: false,
+};
+
+if (!store.has("settings")) {
+  store.set("settings", defaultSettings);
+}
+
+const settings = store.get("settings");
+
+for (const key in defaultSettings) {
+  if (
+    !settings.hasOwnProperty(key) ||
+    typeof settings[key] !== typeof defaultSettings[key]
+  ) {
+    settings[key] = defaultSettings[key];
+    store.set("settings", settings);
+  }
+}
+
+applySwitches(settings);
+
+app.commandLine.appendSwitch("high-dpi-support", "1");
+app.commandLine.appendSwitch("ignore-gpu-blacklist");
 app.allowRendererProcessReuse = true;
+
+if (settings.discord_rpc) {
+  new (require("./rpc"))();
+}
 
 autoUpdater.setFeedURL({
   provider: "github",
@@ -44,6 +91,7 @@ async function checkForUpdates() {
 
 function createWindow() {
   let win = new BrowserWindow({
+    fullscreen: settings.auto_fullscreen,
     icon: path.join(__dirname, "assets/icon.ico"),
     title: "Juice Client",
     width: 1280,
@@ -60,42 +108,17 @@ function createWindow() {
 
   win.on("page-title-updated", (e) => e.preventDefault());
 
-  function registerShortcut(key, action) {
-    shortcut.register(win, key, action);
-  }
-
-  registerShortcut("Escape", () => {
-    win.webContents.executeJavaScript(`document.exitPointerLock()`);
-  });
-
-  registerShortcut("F4", () => {
-    win.loadURL("https://kirka.io");
-  });
-
-  registerShortcut("F5", () => {
-    win.reload();
-  });
-
-  registerShortcut("F6", () => {
-    win.loadURL(clipboard.readText());
-
-  });
-
-  registerShortcut("Ctrl+R", () => {
-    win.reload();
-  });
-
-  registerShortcut("F11", () => {
-    win.setFullScreen(!win.isFullScreen());
-  });
-
-  registerShortcut("F12", () => {
-    win.webContents.openDevTools();
-  });
-
-  registerShortcut("Ctrl+Shift+I", () => {
-    win.webContents.openDevTools();
-  });
+  shortcut.register(win, "Escape", () =>
+    win.webContents.executeJavaScript(`document.exitPointerLock()`)
+  );
+  shortcut.register(win, "Alt+F4", () => win.close());
+  shortcut.register(win, "F4", () => win.loadURL("https://kirka.io"));
+  shortcut.register(win, "F5", () => win.reload());
+  shortcut.register(win, "F6", () => win.loadURL(clipboard.readText()));
+  shortcut.register(win, "Ctrl+R", () => win.reload());
+  shortcut.register(win, "F11", () => win.setFullScreen(!win.isFullScreen()));
+  shortcut.register(win, "F12", () => win.webContents.openDevTools());
+  shortcut.register(win, "Ctrl+Shift+I", () => win.webContents.openDevTools());
 }
 
 app.on("ready", async () => {

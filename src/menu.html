@@ -1,0 +1,311 @@
+<style>
+  :root {
+    --orange: #ff932d;
+    --green: #acfa70;
+  }
+
+  .menu {
+    width: 40rem;
+    height: 35rem;
+    border-radius: 1rem;
+    background: linear-gradient(0deg, #ff922da1, #acfa70a1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    overflow: hidden;
+    padding: 0.5rem;
+    display: none;
+  }
+
+  .menu[data-active="true"] {
+    display: block;
+  }
+
+  .menu .container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(8px);
+  }
+
+  .menu .sidebar {
+    width: 40%;
+    height: 100%;
+    border-radius: 0.75rem;
+    background: rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .menu .line {
+    width: 0.5rem;
+    height: 100%;
+  }
+
+  .menu .sep {
+    margin: 0.5rem 0;
+    height: 0.05rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 100%;
+  }
+
+  .menu .content {
+    width: 60%;
+    height: 100%;
+    border-radius: 0.75rem;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    box-sizing: border-box;
+    overflow-y: scroll;
+  }
+
+  .menu .options {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: 0.5rem;
+    display: none;
+  }
+
+  .menu .options.active {
+    display: flex;
+  }
+
+  .menu .nav {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .menu .bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.25rem;
+  }
+
+  .menu .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .menu ::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .menu input[type="text"] {
+    height: 3rem;
+    padding: 0 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(45deg, #ff922d20, #acfa7020);
+    outline: none;
+  }
+
+  .menu .tab {
+    height: 3rem;
+    padding: 0 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .menu .tab:hover {
+    background: #acfa7020;
+  }
+
+  .menu .tab.active {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: #acfa708c;
+  }
+
+  .menu .option-group {
+    background: #acfa708c;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .menu .option {
+    color: white;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .menu .option input[type="text"] {
+    width: 40%;
+    height: 2rem;
+  }
+
+  .menu .restart:after,
+  .menu .requires-restart > span:after {
+    content: "*";
+    color: red;
+    margin-left: 0.25rem;
+  }
+
+  @keyframes rotateHue {
+    0% {
+      filter: hue-rotate(0deg);
+    }
+    100% {
+      filter: hue-rotate(360deg);
+    }
+  }
+</style>
+<div class="menu" data-active="true">
+  <div class="container">
+    <div class="sidebar">
+      <div class="nav">
+        <input type="text" class="juice search" placeholder="Search" />
+        <span class="sep"></span>
+        <div data-tab="ui" class="juice tab active">UI</div>
+        <div data-tab="performance" class="juice tab">Performance</div>
+        <div data-tab="client" class="juice tab">Client</div>
+      </div>
+      <div class="bottom">
+        <div class="foot">
+          <span>Right Shift to toggle menu</span>
+        </div>
+        <span class="sep"></span>
+        <div class="foot">
+          <span class="ver">v1.0.0</span>
+          <span class="restart">Requires Restart</span>
+        </div>
+      </div>
+    </div>
+    <span class="line"></span>
+    <div class="content">
+      <div id="ui-options" class="juice options">
+        <div class="option-group">
+          <div class="option">
+            <span>Permanent Crosshair</span>
+            <input type="checkbox" / data-setting="perm_crosshair">
+          </div>
+          <div class="option">
+            <span>Hitmarker Link</span>
+            <input type="text" / data-setting="hitmarker_link">
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="option">
+            <span>CSS Link</span>
+            <input type="text" / data-setting="css_link">
+          </div>
+          <div class="option">
+            <span>Rave Mode</span>
+            <input type="checkbox" data-setting="rave_mode" />
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="option">
+            <span>Hide Chat</span>
+            <input type="checkbox" / data-setting="hide_chat">
+          </div>
+          <div class="option">
+            <span>Hide Interface</span>
+            <input type="checkbox" / data-setting="hide_interface">
+          </div>
+          <div class="option">
+            <span>UI Animations</span>
+            <input type="checkbox" / data-setting="ui_animations">
+          </div>
+          <div class="option">
+            <span>Skip Loading Screen</span>
+            <input type="checkbox" / data-setting="skip_loading">
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="option">
+            <span>Interface Opacity</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              class="range"
+              data-setting="interface_opacity"
+            />
+          </div>
+          <div class="option">
+            <span>Interface Bounds</span>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              class="range"
+              data-setting="interface_bounds"
+            />
+          </div>
+        </div>
+      </div>
+      <div id="performance-options" class="juice options">
+        <div class="option-group">
+          <div class="option requires-restart">
+            <span>Unlimited FPS</span>
+            <input type="checkbox" / data-setting="unlimited_fps">
+          </div>
+          <div class="option requires-restart">
+            <span>Auto Fullscreen</span>
+            <input type="checkbox" / data-setting="auto_fullscreen">
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="option">
+            <span>Experimental Flags</span>
+            <input type="checkbox" / data-setting="experimental_flags">
+          </div>
+          <div class="option">
+            <span>Low Latency</span>
+            <input type="checkbox" / data-setting="low_latency">
+          </div>
+          <div class="option">
+            <span>Increase Limits</span>
+            <input type="checkbox" / data-setting="increase_limits">
+          </div>
+          <div class="option">
+            <span>Helpful Flags</span>
+            <input type="checkbox" / data-setting="helpful_flags">
+          </div>
+          <div class="option">
+            <span>Remove Useless Features</span>
+            <input type="checkbox" / data-setting="remove_useless_features">
+          </div>
+          <div class="option">
+            <span>In Process GPU</span>
+            <input type="checkbox" / data-setting="in_process_gpu">
+          </div>
+          <div class="option">
+            <span>GPU Rasterization</span>
+            <input type="checkbox" / data-setting="gpu_rasterization">
+          </div>
+        </div>
+      </div>
+      <div id="client-options" class="juice options">
+        <div class="option-group">
+          <div class="option requires-restart">
+            <span>Discord RPC</span>
+            <input type="checkbox" / data-setting="discord_rpc">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
