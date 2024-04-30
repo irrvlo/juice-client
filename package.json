@@ -1,6 +1,6 @@
 {
   "name": "juice-client",
-  "version": "1.0.5",
+  "version": "1.0.51",
   "description": "Electron client for Kirka.io",
   "main": "src/main.js",
   "scripts": {
