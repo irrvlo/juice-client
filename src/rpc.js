@@ -1,3 +1,5 @@
+const version = require("../package.json").version;
+
 module.exports = class {
   constructor() {
     this.client = new (require("discord-rpc-revamp").Client)();
@@ -7,7 +9,7 @@ module.exports = class {
         .setActivity({
           startTimestamp: Date.now(),
           largeImageKey: "juicer",
-          largeImageText: "Juice Client",
+          largeImageText: "Juice Client v" + version,
           buttons: [
             { label: "Download", url: "https://juice.irrvlo.xyz" },
             { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },

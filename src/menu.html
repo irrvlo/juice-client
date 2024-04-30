@@ -183,11 +183,11 @@
       </div>
       <div class="bottom">
         <div class="foot">
-          <span>Right Shift to toggle menu</span>
+          <span class="keybind"></span>
         </div>
         <span class="sep"></span>
         <div class="foot">
-          <span class="ver">v1.0.0</span>
+          <span class="ver"></span>
           <span class="restart">Requires Restart</span>
         </div>
       </div>
@@ -268,31 +268,31 @@
           </div>
         </div>
         <div class="option-group">
-          <div class="option">
+          <div class="option requires-restart">
             <span>Experimental Flags</span>
             <input type="checkbox" / data-setting="experimental_flags">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>Low Latency</span>
             <input type="checkbox" / data-setting="low_latency">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>Increase Limits</span>
             <input type="checkbox" / data-setting="increase_limits">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>Helpful Flags</span>
             <input type="checkbox" / data-setting="helpful_flags">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>Remove Useless Features</span>
             <input type="checkbox" / data-setting="remove_useless_features">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>In Process GPU</span>
             <input type="checkbox" / data-setting="in_process_gpu">
           </div>
-          <div class="option">
+          <div class="option requires-restart">
             <span>GPU Rasterization</span>
             <input type="checkbox" / data-setting="gpu_rasterization">
           </div>
@@ -303,6 +303,10 @@
           <div class="option requires-restart">
             <span>Discord RPC</span>
             <input type="checkbox" / data-setting="discord_rpc">
+          </div>
+          <div class="option custom">
+            <span>Menu Toggle Keybind</span>
+            <button class="juice change-keybind"></button>
           </div>
         </div>
       </div>

@@ -29,6 +29,7 @@ const defaultSettings = {
   remove_useless_features: false,
   in_process_gpu: false,
   gpu_rasterization: false,
+  menu_keybind: "ShiftRight",
 };
 
 if (!store.has("settings")) {

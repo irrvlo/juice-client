@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(menu);
     menu.querySelector(".ver").innerText = `v${version}`;
 
+    menu.querySelector(
+      ".keybind"
+    ).innerText = `Press ${settings.menu_keybind} to toggle menu`;
+
     const localStorage = window.localStorage;
     const menuToggle = menu.querySelector(".menu");
 
@@ -43,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const handleKeyDown = (e) => {
-      if (e.code === "ShiftRight") {
+      if (e.code === settings.menu_keybind) {
         const isActive = menuToggle.getAttribute("data-active") === "true";
         menuToggle.setAttribute("data-active", !isActive);
         localStorage.setItem("juice-menu", !isActive);
@@ -69,6 +73,28 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     initMenu();
+
+    const handleMenuKeybindChange = () => {
+      const changeKeybindButton = document.querySelector(".change-keybind");
+      changeKeybindButton.innerText = settings.menu_keybind;
+
+      changeKeybindButton.addEventListener("click", () => {
+        changeKeybindButton.innerText = "Press any key";
+        const listener = (e) => {
+          settings.menu_keybind = e.code;
+          store.set("settings", settings);
+          changeKeybindButton.innerText = e.code;
+          menu.querySelector(
+            ".keybind"
+          ).innerText = `Press ${settings.menu_keybind} to toggle menu`;
+          document.removeEventListener("keydown", listener);
+        };
+
+        document.addEventListener("keydown", listener);
+      });
+    };
+
+    handleMenuKeybindChange();
 
     const handleMenuInputChange = (input) => {
       const setting = input.dataset.setting;
@@ -134,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const handleSearch = () => {
       const searchInput = document.querySelector(".juice.search");
 
-      const settings = document.querySelectorAll(".option");
+      const settings = document.querySelectorAll(".option:not(.custom)");
 
       searchInput.addEventListener("input", () => {
         const searchValue = searchInput.value.toLowerCase();
@@ -247,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (settings.perm_crosshair) {
         styles.push(
-          ".crosshair-static { opacity: 1 !important; visibility: visible !important; }"
+          ".crosshair-static { opacity: 1 !important; visibility: visible !important; display: block !important; }"
         );
       }
 
