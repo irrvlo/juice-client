@@ -1,6 +1,10 @@
 {
   "name": "juice-client",
-  "version": "1.0.51",
+<<<<<<< Updated upstream
+  "version": "1.0.6",
+=======
+  "version": "1.0.55",
+>>>>>>> Stashed changes
   "description": "Electron client for Kirka.io",
   "main": "src/main.js",
   "scripts": {

@@ -120,6 +120,10 @@ function createWindow() {
 
   win.on("page-title-updated", (e) => e.preventDefault());
 
+  win.webContents.on("did-navigate-in-page", (e, url) => {
+    console.log(url);
+  });
+
   shortcut.register(win, "Escape", () =>
     win.webContents.executeJavaScript(`document.exitPointerLock()`)
   );
@@ -127,7 +131,6 @@ function createWindow() {
   shortcut.register(win, "F4", () => win.loadURL("https://kirka.io"));
   shortcut.register(win, "F5", () => win.reload());
   shortcut.register(win, "F6", () => win.loadURL(clipboard.readText()));
-  shortcut.register(win, "Ctrl+R", () => win.reload());
   shortcut.register(win, "F11", () => win.setFullScreen(!win.isFullScreen()));
   shortcut.register(win, "F12", () => win.webContents.openDevTools());
   shortcut.register(win, "Ctrl+Shift+I", () => win.webContents.openDevTools());
