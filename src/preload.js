@@ -185,19 +185,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const joinUsingURL = () => {
     const joinBtn = document.createElement("button");
     joinBtn.innerText = "Join Game";
-    joinBtn.className = "joinUsingURL";
-    joinBtn.addEventListener("click", async () => {
-      try {
-        const clipboardUrl = await navigator.clipboard.readText();
-        const urlPattern = /^https:\/\/kirka\.io\/games\//i;
-        if (urlPattern.test(clipboardUrl)) {
-          window.location.href = clipboardUrl;
-        } else {
-          console.log("Clipboard does not contain a valid Kirka-related URL.");
-        }
-      } catch (error) {
-        console.error("Unable to read from clipboard:", error);
+    joinBtn.className = "joinUsingURL text-2";
+    joinBtn.onclick = () => {
+      const clipboardUrl = navigator.clipboard.readText();
+      const urlPattern = /^https:\/\/kirka\.io\/games\//i;
+      if (urlPattern.test(clipboardUrl)) {
+        window.location.href = clipboardUrl;
       }
+    };
+
+    Object.assign(joinBtn.style, {
+      border: "4px solid #26335b",
+      backgroundColor: "#3b4975",
+      fontWeight: "700",
+      color: "#fff",
+      padding: "4px 8px",
+      borderRadius: "4px",
+      outline: "none",
+      cursor: "pointer",
+      marginBottom: "4px",
     });
 
     const container = document.querySelector(".play-content");
@@ -310,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (settings.rave_mode) {
         styles.push(
-          "canvas { animation: rotateHue 1s linear infinite alternate none running !important; }"
+          "canvas { animation: rotateHue 1s linear infinite !important; }"
         );
       }
 
@@ -338,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUIFeatures();
   };
 
-  joinUsingURL();
   observeBodyChanges();
   loadTheme();
   applyUIFeatures();
