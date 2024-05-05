@@ -20,7 +20,7 @@ Windows only for now, Linux and MacOS builds will come if its requested enough.
 | Hotkey | Description |
 | ------ | ----------- |
 | F4 | Return to https://kirka.io |
-| F5 & Ctrl + R| Reload |
+| F5 | Reload |
 | F6 | Load URL |
 | F11 | Fullscreen |
 | F12 & Ctrl + Shift + I | Open DevTools |
