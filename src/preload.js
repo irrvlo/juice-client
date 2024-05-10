@@ -1,8 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const version = require("../package.json").version;
-const Store = require("electron-store");
-const store = new Store();
+const Menu = require("./menu");
+const { ipcRenderer } = require("electron");
+
+ipcRenderer.on("url-changed", (e, url) => {
+  console.log(url);
+});
 
 if (!window.location.href.startsWith("https://kirka.io/")) {
   window.require = undefined;
@@ -10,211 +11,38 @@ if (!window.location.href.startsWith("https://kirka.io/")) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const loadMenu = async () => {
-    const menuHTML = fs.readFileSync(
-      path.join(__dirname, "./menu.html"),
-      "utf8"
-    );
-
-    const settings = store.get("settings");
-
-    let menu = document.createElement("div");
-    menu.innerHTML = menuHTML;
-    menu.id = "juice-menu";
-    menu.style.cssText =
-      "z-index: 99999999;  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);";
-
-    document.body.appendChild(menu);
-    menu.querySelector(".ver").innerText = `v${version}`;
-
-    menu.querySelector(
-      ".keybind"
-    ).innerText = `Press ${settings.menu_keybind} to toggle menu`;
-
-    const localStorage = window.localStorage;
-    const menuToggle = menu.querySelector(".menu");
-
-    if (!localStorage.getItem("juice-menu")) {
-      localStorage.setItem(
-        "juice-menu",
-        menuToggle.getAttribute("data-active")
-      );
-    } else {
-      menuToggle.setAttribute(
-        "data-active",
-        localStorage.getItem("juice-menu")
-      );
-    }
-
-    const handleKeyDown = (e) => {
-      if (e.code === settings.menu_keybind) {
-        const isActive = menuToggle.getAttribute("data-active") === "true";
-        if (!isActive) {
-          document.exitPointerLock();
-        }
-        menuToggle.setAttribute("data-active", !isActive);
-        localStorage.setItem("juice-menu", !isActive);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    const initMenu = () => {
-      const inputs = document.querySelectorAll("input[data-setting]");
-
-      inputs.forEach((input) => {
-        const setting = input.dataset.setting;
-        const type = input.type;
-        const value = settings[setting];
-
-        if (type === "checkbox") {
-          input.checked = value;
-        } else {
-          input.value = value;
-        }
-      });
-    };
-
-    initMenu();
-
-    const handleMenuKeybindChange = () => {
-      const changeKeybindButton = document.querySelector(".change-keybind");
-      changeKeybindButton.innerText = settings.menu_keybind;
-
-      changeKeybindButton.addEventListener("click", () => {
-        changeKeybindButton.innerText = "Press any key";
-        const listener = (e) => {
-          settings.menu_keybind = e.code;
-          store.set("settings", settings);
-          changeKeybindButton.innerText = e.code;
-          menu.querySelector(
-            ".keybind"
-          ).innerText = `Press ${settings.menu_keybind} to toggle menu`;
-          document.removeEventListener("keydown", listener);
-        };
-
-        document.addEventListener("keydown", listener);
-      });
-    };
-
-    handleMenuKeybindChange();
-
-    const handleMenuInputChange = (input) => {
-      const setting = input.dataset.setting;
-      const type = input.type;
-      const value = type === "checkbox" ? input.checked : input.value;
-
-      settings[setting] = value;
-      store.set("settings", settings);
-
-      const event = new CustomEvent("juice-settings-changed", {
-        detail: {
-          setting: setting,
-          value: value,
-        },
-      });
-
-      document.dispatchEvent(event);
-    };
-
-    const handleMenuInputChanges = () => {
-      const inputs = document.querySelectorAll("input[data-setting]");
-
-      inputs.forEach((input) => {
-        input.addEventListener("change", () => handleMenuInputChange(input));
-      });
-    };
-
-    handleMenuInputChanges();
-
-    const tabToContentMap = {
-      ui: document.querySelector("#ui-options"),
-      performance: document.querySelector("#performance-options"),
-      client: document.querySelector("#client-options"),
-    };
-
-    const handleTabChange = (tab) => {
-      const tabs = document.querySelectorAll(".juice.tab");
-      const contents = document.querySelectorAll(".juice.options");
-
-      tabs.forEach((tab) => {
-        tab.classList.remove("active");
-      });
-
-      contents.forEach((content) => {
-        content.classList.remove("active");
-      });
-
-      tab.classList.add("active");
-      tabToContentMap[tab.dataset.tab].classList.add("active");
-    };
-
-    const handleTabChanges = () => {
-      const tabs = document.querySelectorAll(".juice.tab");
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => handleTabChange(tab));
-      });
-    };
-
-    handleTabChanges();
-    document.querySelector(".juice.tab").click();
-
-    const handleSearch = () => {
-      const searchInput = document.querySelector(".juice.search");
-
-      const settings = document.querySelectorAll(".option:not(.custom)");
-
-      searchInput.addEventListener("input", () => {
-        const searchValue = searchInput.value.toLowerCase();
-
-        settings.forEach((setting) => {
-          setting.style.display = setting.textContent
-            .toLowerCase()
-            .includes(searchValue)
-            ? "flex"
-            : "none";
-        });
-      });
-    };
-    handleSearch();
-  };
-
-  loadMenu();
+  const menu = new Menu();
+  menu.init();
 
   const joinUsingURL = () => {
-    const joinBtn = document.createElement("button");
-    joinBtn.innerText = "Join Game";
-    joinBtn.className = "joinUsingURL text-2";
-    joinBtn.onclick = () => {
-      const clipboardUrl = navigator.clipboard.readText();
-      const urlPattern = /^https:\/\/kirka\.io\/games\//i;
-      if (urlPattern.test(clipboardUrl)) {
-        window.location.href = clipboardUrl;
-      }
-    };
-
-    Object.assign(joinBtn.style, {
-      border: "4px solid #26335b",
-      backgroundColor: "#3b4975",
-      fontWeight: "700",
-      color: "#fff",
-      padding: "4px 8px",
-      borderRadius: "4px",
-      outline: "none",
-      cursor: "pointer",
-      marginBottom: "4px",
-    });
-
     const container = document.querySelector(".play-content");
     if (container && !container.querySelector(".joinUsingURL")) {
+      const joinBtn = document.createElement("button");
+      joinBtn.innerText = "Join Game";
+      joinBtn.className = "joinUsingURL text-2";
+      joinBtn.onclick = () => {
+        const clipboardUrl = navigator.clipboard.readText();
+        const urlPattern = /^https:\/\/kirka\.io\/games\//i;
+        if (urlPattern.test(clipboardUrl)) {
+          window.location.href = clipboardUrl;
+        }
+      };
+
+      Object.assign(joinBtn.style, {
+        border: "4px solid #26335b",
+        backgroundColor: "#3b4975",
+        fontWeight: "700",
+        color: "#fff",
+        padding: "4px 8px",
+        borderRadius: "4px",
+        outline: "none",
+        cursor: "pointer",
+        marginBottom: "4px",
+      });
+
       container.insertBefore(
         joinBtn,
         container.querySelector(".play-content-up")
-      );
-    } else {
-      console.error(
-        "Element with class 'play-content' not found or button already exists."
       );
     }
   };
@@ -234,10 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(addedStyles);
 
     const updateTheme = () => {
-      const settings = store.get("settings");
+      const settings = ipcRenderer.sendSync("get-settings");
       const cssLink = settings.css_link;
 
-      if (cssLink) {
+      if (cssLink && settings.css_enabled) {
         addedStyles.innerHTML = `@import url('${cssLink}');`;
       } else {
         addedStyles.innerHTML = "";
@@ -245,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.addEventListener("juice-settings-changed", (e) => {
-      if (e.detail.setting === "css_link") {
+      if (e.detail.setting === "css_link" || e.detail.setting === "css_enabled") {
         updateTheme();
       }
     });
@@ -259,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(addedStyles);
 
     const updateUIFeatures = () => {
-      const settings = store.get("settings");
+      const settings = ipcRenderer.sendSync("get-settings");
       const styles = [];
 
       if (settings.perm_crosshair) {

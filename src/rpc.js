@@ -8,7 +8,7 @@ module.exports = class {
       this.client
         .setActivity({
           startTimestamp: Date.now(),
-          largeImageKey: "juicer",
+          largeImageKey: "juice",
           largeImageText: "Juice Client v" + version,
           buttons: [
             { label: "Download", url: "https://juice.irrvlo.xyz" },

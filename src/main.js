@@ -1,12 +1,18 @@
 require("v8-compile-cache");
-const { app, BrowserWindow, dialog, clipboard, protocol } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  dialog,
+  clipboard,
+  protocol,
+  ipcMain,
+} = require("electron");
 const { autoUpdater } = require("electron-updater");
 const { applySwitches } = require("./switches");
 const Store = require("electron-store");
 const shortcut = require("electron-localshortcut");
 const path = require("path");
 const initResourceSwapper = require("./swapper");
-
 const store = new Store();
 
 const defaultSettings = {
@@ -23,6 +29,7 @@ const defaultSettings = {
   auto_fullscreen: true,
   discord_rpc: true,
   css_link: "",
+  css_enabled: false,
   experimental_flags: false,
   low_latency: false,
   increase_limits: false,
@@ -50,6 +57,15 @@ for (const key in defaultSettings) {
 }
 
 applySwitches(settings);
+
+ipcMain.on("update-setting", (event, key, value) => {
+  settings[key] = value;
+  store.set("settings", settings);
+});
+
+ipcMain.on("get-settings", (event) => {
+  event.returnValue = store.get("settings");
+});
 
 app.commandLine.appendSwitch("high-dpi-support", "1");
 app.commandLine.appendSwitch("ignore-gpu-blacklist");
@@ -110,6 +126,7 @@ function createWindow() {
     height: 720,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
       preload: path.join(__dirname, "preload.js"),
     },
   });
@@ -119,10 +136,6 @@ function createWindow() {
   win.loadURL("https://kirka.io");
 
   win.on("page-title-updated", (e) => e.preventDefault());
-
-  win.webContents.on("did-navigate-in-page", (e, url) => {
-    console.log(url);
-  });
 
   shortcut.register(win, "Escape", () =>
     win.webContents.executeJavaScript(`document.exitPointerLock()`)
@@ -137,8 +150,8 @@ function createWindow() {
 }
 
 app.on("ready", async () => {
+  await checkForUpdates();
   initResourceSwapper();
-  checkForUpdates();
   createWindow();
 });
 
