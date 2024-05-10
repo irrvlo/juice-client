@@ -10,6 +10,10 @@ win:
         - ia32
   icon: "src/assets/icon.ico"
   artifactName: "${name}-setup-win-${arch}-${version}.${ext}"
+mac:
+  target: dmg
+  icon: "src/assets/icon.icns"
+  artifactName: "${name}-setup-mac-${version}.${ext}"
 publish:
   - provider: github
     owner: irrvlo
