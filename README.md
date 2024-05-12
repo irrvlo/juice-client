@@ -13,7 +13,19 @@ Windows only for now, Linux and MacOS builds will come if its requested enough.
 
 - Uncapped FPS
 - Discord Rich Presence
+- Custom menu with changeable keybind
 - Join Game Button
+- Permanent Crosshair
+- Custom Hitmarker (Using Link)
+- Custom CSS (Using Link) with toggle
+- Rave mode (RGB)
+- Hide Chat
+- Hide Interface
+- UI Animations
+- Skip Loading Screen
+- Inteface opacity and bounds
+- Auto Fullscreen
+- Experimental Flags
 - more to come :)
 
 ## Hotkeys
