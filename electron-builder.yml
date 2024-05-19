@@ -8,11 +8,11 @@ win:
       arch:
         - x64
         - ia32
-  icon: "src/assets/icon.ico"
+  icon: "src/assets/img/icon.png"
   artifactName: "${name}-setup-win-${arch}-${version}.${ext}"
 mac:
   target: dmg
-  icon: "src/assets/icon.icns"
+  icon: "src/assets/img/icon.icns"
   artifactName: "${name}-setup-mac-${version}.${ext}"
 publish:
   - provider: github

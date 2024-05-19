@@ -1,6 +1,6 @@
+const { app, session, protocol } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const { app, session, protocol } = require("electron");
 const url = require("url");
 
 const initResourceSwapper = () => {
@@ -8,7 +8,11 @@ const initResourceSwapper = () => {
     callback({ path: request.url.replace("juiceclient://", "") })
   );
 
-  const SWAP_FOLDER = path.join(app.getPath("documents"), "JuiceClient", "swapper");
+  const SWAP_FOLDER = path.join(
+    app.getPath("documents"),
+    "JuiceClient",
+    "swapper"
+  );
   const assetsFolder = path.join(SWAP_FOLDER, "assets");
   const folders = ["css", "media", "img", "glb"];
 
@@ -34,10 +38,17 @@ const initResourceSwapper = () => {
       const filePath = path.join(dir, file);
       if (fs.statSync(filePath).isDirectory()) allFilesSync(filePath);
       else {
-        const useAssets = /JuiceClient[\\/]swapper[\\/]assets[\\/](css|media|img|glb)[\\/].*\.(.{4})/.test(filePath);
+        const useAssets =
+          /JuiceClient[\\/]swapper[\\/]assets[\\/](css|media|img|glb)[\\/].*\.(.{4})/.test(
+            filePath
+          );
         if (!useAssets) return;
 
-        const kirk = "*://" + (useAssets ? "kirka.io" : "") + filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/") + "*";
+        const kirk =
+          "*://" +
+          (useAssets ? "kirka.io" : "") +
+          filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/") +
+          "*";
         swap.filter.urls.push(kirk);
         swap.files[kirk.replace(/\*/g, "")] = url.format({
           pathname: filePath,
@@ -54,11 +65,14 @@ const initResourceSwapper = () => {
     session.defaultSession.webRequest.onBeforeRequest(
       swap.filter,
       (details, callback) => {
-        const redirect = "juiceclient://" + (swap.files[details.url.replace(/https|http|(\?.*)|(#.*)/gi, "")] || details.url);
+        const redirect =
+          "juiceclient://" +
+          (swap.files[details.url.replace(/https|http|(\?.*)|(#.*)/gi, "")] ||
+            details.url);
         callback({ cancel: false, redirectURL: redirect });
       }
     );
   }
 };
 
-module.exports = initResourceSwapper;
+module.exports = { initResourceSwapper };

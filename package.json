@@ -1,6 +1,6 @@
 {
   "name": "juice-client",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Electron client for Kirka.io",
   "main": "src/main.js",
   "scripts": {
@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "discord-rpc-revamp": "^2.0.4",
+    "electron-is-packaged": "^1.0.2",
     "electron-localshortcut": "^3.2.1",
+    "electron-log": "^5.1.4",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.1.8",
     "v8-compile-cache": "^2.4.0"

@@ -1,16 +1,17 @@
 const Menu = require("./menu");
 const { ipcRenderer } = require("electron");
 
-ipcRenderer.on("url-changed", (e, url) => {
-  console.log(url);
-});
-
-if (!window.location.href.startsWith("https://kirka.io/")) {
+if (window.location.href.includes("discord")) {
   window.require = undefined;
   document.querySelector("#juice-menu").remove();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  ipcRenderer.on("queue-game", () => {
+    if (!document.querySelector("#play-btn")) return;
+    document.querySelector("#play-btn").click();
+  });
+
   const menu = new Menu();
   menu.init();
 
@@ -20,10 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const joinBtn = document.createElement("button");
       joinBtn.innerText = "Join Game";
       joinBtn.className = "joinUsingURL text-2";
-      joinBtn.onclick = () => {
-        const clipboardUrl = navigator.clipboard.readText();
+      joinBtn.onclick = async () => {
+        console.log("clicked");
+        const clipboardUrl = await navigator.clipboard.readText();
         const urlPattern = /^https:\/\/kirka\.io\/games\//i;
+        console.log(urlPattern.test(clipboardUrl));
+        console.log(clipboardUrl);
         if (urlPattern.test(clipboardUrl)) {
+          console.log("urlPattern");
+          console.log(clipboardUrl);
           window.location.href = clipboardUrl;
         }
       };
@@ -73,7 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.addEventListener("juice-settings-changed", (e) => {
-      if (e.detail.setting === "css_link" || e.detail.setting === "css_enabled") {
+      if (
+        e.detail.setting === "css_link" ||
+        e.detail.setting === "css_enabled"
+      ) {
         updateTheme();
       }
     });

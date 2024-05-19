@@ -1,13 +1,13 @@
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
-const version = require("../package.json").version;
+const version = require("../../package.json").version;
 
 class Menu {
   constructor() {
     this.settings = ipcRenderer.sendSync("get-settings");
     this.menuHTML = fs.readFileSync(
-      path.join(__dirname, "./menu.html"),
+      path.join(__dirname, "../assets/html/menu.html"),
       "utf8"
     );
     this.menu = this.createMenu();
