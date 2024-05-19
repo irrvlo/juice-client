@@ -1,7 +1,10 @@
 const Menu = require("./menu");
 const { ipcRenderer } = require("electron");
 
-if (window.location.href.includes("discord")) {
+if (!window.location.href.startsWith("https://kirka.io")) {
+  Object.defineProperty(navigator, "userAgent", {
+    get: () => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+  });
   window.require = undefined;
   document.querySelector("#juice-menu").remove();
 }
