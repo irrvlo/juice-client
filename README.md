@@ -7,7 +7,7 @@ A light Electron client for Kirka.io. Join our [discord](https://discord.gg/FjzA
 - [Website](https://juice.irrvlo.xyz)
 - [Releases](https://github.com/irrvlo/juice-client/releases)
 
-Windows only for now, Linux and MacOS builds will come if its requested enough.
+Windows and MacOS releases are available. Linux will come if requested enough.
 
 # What features does this have?
 
