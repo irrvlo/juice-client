@@ -23,7 +23,7 @@ Windows and MacOS releases are available. Linux will come if requested enough.
 - Hide Interface
 - UI Animations
 - Skip Loading Screen
-- Inteface opacity and bounds
+- Interface opacity and bounds
 - Auto Fullscreen
 - Experimental Flags
 - more to come :)
@@ -31,6 +31,7 @@ Windows and MacOS releases are available. Linux will come if requested enough.
 ## Hotkeys
 | Hotkey | Description |
 | ------ | ----------- |
+| F3 | Quick Queue |
 | F4 | Return to https://kirka.io |
 | F5 | Reload |
 | F6 | Load URL |
