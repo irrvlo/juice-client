@@ -31,10 +31,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Install dmg-license
-        if: matrix.os == 'macos-12'
-        run: npm install dmg-license
-
       - name: Get version and name from package.json
         id: get_version_name
         run: |
