@@ -21,25 +21,15 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '18.15.0'
 
       - name: Install Dependencies
         run: npm install
-
-      - name: Setup Python (macOS)
-        if: matrix.os == 'macos-12'
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Verify Python Installation
-        if: matrix.os == 'macos-12'
-        run: python3 --version
 
       - name: Get version and name from package.json
         id: get_version_name
