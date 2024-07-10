@@ -43,10 +43,17 @@ const createWindow = () => {
     width: 1280,
     height: 720,
     show: false,
+    backgroundColor: "#141414",
     webPreferences: {
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
       preload: path.join(__dirname, "../preload/game.js"),
     },
+  });
+  
+  gameWindow.webContents.on("did-navigate-in-page", (e, url) => {
+    gameWindow.webContents.send("url-change", url);
   });
 
   gameWindow.loadURL("https://kirka.io");
@@ -62,8 +69,8 @@ const createWindow = () => {
   gameWindow.on("page-title-updated", (e) => e.preventDefault());
 
   gameWindow.on("closed", () => {
-	ipcMain.removeAllListeners("get-settings");
-	ipcMain.removeAllListeners("update-setting");
+    ipcMain.removeAllListeners("get-settings");
+    ipcMain.removeAllListeners("update-setting");
     gameWindow = null;
   });
 };

@@ -14,13 +14,7 @@
     "discord_rpc": true,
     "css_link": "",
     "css_enabled": false,
-    "experimental_flags": false,
-    "low_latency": false,
-    "increase_limits": false,
-    "helpful_flags": false,
-    "remove_useless_features": false,
     "in_process_gpu": false,
-    "gpu_rasterization": false,
     "menu_keybind": "ShiftRight"
   }
 }

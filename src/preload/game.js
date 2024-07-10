@@ -3,66 +3,52 @@ const { ipcRenderer } = require("electron");
 
 if (!window.location.href.startsWith("https://kirka.io")) {
   Object.defineProperty(navigator, "userAgent", {
-    get: () => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    get: () =>
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
   });
   window.require = undefined;
   document.querySelector("#juice-menu").remove();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  ipcRenderer.on("queue-game", () => {
-    if (!document.querySelector("#play-btn")) return;
-    document.querySelector("#play-btn").click();
-  });
-
+document.addEventListener("DOMContentLoaded", async () => {
   const menu = new Menu();
   menu.init();
 
   const joinUsingURL = () => {
     const container = document.querySelector(".play-content");
-    if (container && !container.querySelector(".joinUsingURL")) {
-      const joinBtn = document.createElement("button");
-      joinBtn.innerText = "Join Game";
-      joinBtn.className = "joinUsingURL text-2";
-      joinBtn.onclick = async () => {
-        console.log("clicked");
-        const clipboardUrl = await navigator.clipboard.readText();
-        const urlPattern = /^https:\/\/kirka\.io\/games\//i;
-        console.log(urlPattern.test(clipboardUrl));
+    if (!container || document.querySelector(".joinUsingURL")) return;
+    const joinBtn = document.createElement("button");
+    joinBtn.innerText = "Join Game";
+    joinBtn.className = "joinUsingURL text-2";
+    joinBtn.onclick = async () => {
+      console.log("clicked");
+      const clipboardUrl = await navigator.clipboard.readText();
+      const urlPattern = /^https:\/\/kirka\.io\/games\//i;
+      console.log(urlPattern.test(clipboardUrl));
+      console.log(clipboardUrl);
+      if (urlPattern.test(clipboardUrl)) {
+        console.log("urlPattern");
         console.log(clipboardUrl);
-        if (urlPattern.test(clipboardUrl)) {
-          console.log("urlPattern");
-          console.log(clipboardUrl);
-          window.location.href = clipboardUrl;
-        }
-      };
+        window.location.href = clipboardUrl;
+      }
+    };
 
-      Object.assign(joinBtn.style, {
-        border: "4px solid #26335b",
-        backgroundColor: "#3b4975",
-        fontWeight: "700",
-        color: "#fff",
-        padding: "4px 8px",
-        borderRadius: "4px",
-        outline: "none",
-        cursor: "pointer",
-        marginBottom: "4px",
-      });
-
-      container.insertBefore(
-        joinBtn,
-        container.querySelector(".play-content-up")
-      );
-    }
-  };
-
-  const observeBodyChanges = () => {
-    new MutationObserver(() => {
-      joinUsingURL();
-    }).observe(document.body, {
-      childList: true,
-      subtree: true,
+    Object.assign(joinBtn.style, {
+      border: "4px solid #26335b",
+      backgroundColor: "#3b4975",
+      fontWeight: "700",
+      color: "#fff",
+      padding: "4px 8px",
+      borderRadius: "4px",
+      outline: "none",
+      cursor: "pointer",
+      marginBottom: "4px",
     });
+
+    container.insertBefore(
+      joinBtn,
+      container.querySelector(".play-content-up")
+    );
   };
 
   const loadTheme = () => {
@@ -184,7 +170,18 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUIFeatures();
   };
 
-  observeBodyChanges();
+  ipcRenderer.on("url-change", (e, url) => {
+    if (url === "https://kirka.io/") {
+      joinUsingURL();
+    }
+  });
+
+  ipcRenderer.on("queue-game", () => {
+    if (!document.querySelector("#play-btn")) return;
+    document.querySelector("#play-btn").click();
+  });
+
+  joinUsingURL();
   loadTheme();
   applyUIFeatures();
 });

@@ -15,8 +15,9 @@ class Menu {
     this.menuToggle = this.menu.querySelector(".menu");
     this.tabToContentMap = {
       ui: this.menu.querySelector("#ui-options"),
+      game: this.menu.querySelector("#game-options"),
       performance: this.menu.querySelector("#performance-options"),
-      client: this.menu.querySelector("#client-options"),
+      misc: this.menu.querySelector("#misc-options"),
     };
   }
 
