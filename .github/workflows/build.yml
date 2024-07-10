@@ -31,6 +31,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Setup Python (macOS)
+        if: matrix.os == 'macos-12'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Verify Python Installation
+        if: matrix.os == 'macos-12'
+        run: python3 --version
+
       - name: Get version and name from package.json
         id: get_version_name
         run: |
@@ -50,17 +60,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Electron App
-        run: |
-          echo "Starting build process..."
-          npm run build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true # Allow the workflow to continue even if this step fails
-
-      - name: Retry Build Electron App if failed
-        if: failure()
-        run: |
-          echo "Retrying build process..."
-          npm run build
+        run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
