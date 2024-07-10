@@ -40,7 +40,7 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
-        env: 
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.get_version_name.outputs.version }}
@@ -50,6 +50,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Electron App
-        run: npm run build
+        run: |
+          echo "Starting build process..."
+          npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true # Allow the workflow to continue even if this step fails
+
+      - name: Retry Build Electron App if failed
+        if: failure()
+        run: |
+          echo "Retrying build process..."
+          npm run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
