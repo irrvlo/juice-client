@@ -18,6 +18,7 @@ class Menu {
       game: this.menu.querySelector("#game-options"),
       performance: this.menu.querySelector("#performance-options"),
       misc: this.menu.querySelector("#misc-options"),
+      externalfeatures: this.menu.querySelector("#externalfeatures-options"),
     };
   }
 
