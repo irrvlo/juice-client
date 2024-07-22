@@ -44,4 +44,4 @@ Juice Client is 100% completely safe to use. Releases are built directly with th
 
 ## Credits
 
-- me baby WOOOOOO
+- irrvlo
