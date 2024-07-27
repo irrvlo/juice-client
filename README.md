@@ -7,7 +7,14 @@ A light Electron client for Kirka.io. Join our [discord](https://discord.gg/FjzA
 - [Website](https://juice.irrvlo.xyz)
 - [Releases](https://github.com/irrvlo/juice-client/releases)
 
-Windows and MacOS releases are available. Linux will come if requested enough.
+## Linux installation:
+- Install git and npm
+- Clone the repository
+- `cd` into the cloned repository.
+- `npm i` to install dependencies.
+- `npm start` to start juice.
+
+Windows and MacOS releases are available.
 
 # What features does this have?
 
