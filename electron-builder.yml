@@ -2,6 +2,7 @@ appId: xyz.irrvlo.juice
 productName: Juice Client
 directories:
   output: "build"
+npmRebuild: false
 win:
   target:
     - target: nsis
