@@ -30,6 +30,12 @@ jobs:
         with:
           node-version: '18.x'
 
+      - name: Install Build Tools (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 make g++
+
       - name: Install Dependencies
         run: npm install
 
