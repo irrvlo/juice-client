@@ -1,10 +1,12 @@
-const { BrowserWindow, ipcMain } = require("electron");
+const { BrowserWindow, ipcMain, app } = require("electron");
 const { default_settings } = require("../util/defaults.json");
 const { registerShortcuts } = require("../util/shortcuts");
 const { applySwitches } = require("../util/switches");
+const { initRPC } = require("../addons/rpc");
 const path = require("path");
 const Store = require("electron-store");
 const store = new Store();
+const fs = require("fs");
 
 if (!store.has("settings")) {
   store.set("settings", default_settings);
@@ -45,13 +47,32 @@ const createWindow = () => {
     show: false,
     backgroundColor: "#141414",
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      enableRemoteModule: false,
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: false,
+      enableRemoteModule: true,
       preload: path.join(__dirname, "../preload/game.js"),
     },
   });
-  
+
+  const scriptsPath = path.join(
+    app.getPath("documents"),
+    "JuiceClient",
+    "scripts"
+  );
+  if (!fs.existsSync(scriptsPath)) {
+    fs.mkdirSync(scriptsPath, { recursive: true });
+  }
+
+  ipcMain.on("get-scripts-path", (e) => {
+    e.returnValue = scriptsPath;
+  });
+
+  gameWindow.webContents.on("new-window", function (e, url) {
+    e.preventDefault();
+    require("electron").shell.openExternal(url);
+  });
+
   gameWindow.webContents.on("did-navigate-in-page", (e, url) => {
     gameWindow.webContents.send("url-change", url);
   });
@@ -77,6 +98,9 @@ const createWindow = () => {
 
 const initGame = () => {
   createWindow();
+  if (settings.discord_rpc) {
+    initRPC();
+  }
 };
 
 module.exports = {

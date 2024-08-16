@@ -7,6 +7,9 @@ const initResourceSwapper = () => {
   protocol.registerFileProtocol("juiceclient", (request, callback) =>
     callback({ path: request.url.replace("juiceclient://", "") })
   );
+  protocol.registerFileProtocol("file", (request, callback) => {
+    callback(decodeURIComponent(request.url.replace("file:///", "")));
+  });
 
   const SWAP_FOLDER = path.join(
     app.getPath("documents"),
@@ -39,7 +42,7 @@ const initResourceSwapper = () => {
       if (fs.statSync(filePath).isDirectory()) allFilesSync(filePath);
       else {
         const useAssets =
-          /JuiceClient[\\/]swapper[\\/]assets[\\/](css|media|img|glb)[\\/].*\.(.{4})/.test(
+          /JuiceClient[\\/]swapper[\\/]assets[\\/](css|media|img|glb)[\\/][^\\/]+\.[^.]+$/.test(
             filePath
           );
         if (!useAssets) return;

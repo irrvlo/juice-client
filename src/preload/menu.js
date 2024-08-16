@@ -18,6 +18,8 @@ class Menu {
       game: this.menu.querySelector("#game-options"),
       performance: this.menu.querySelector("#performance-options"),
       misc: this.menu.querySelector("#misc-options"),
+      scripts: this.menu.querySelector("#scripts-options"),
+      about: this.menu.querySelector("#about-client"),
     };
   }
 
@@ -34,17 +36,21 @@ class Menu {
   init() {
     this.setVersion();
     this.setKeybind();
+    this.setTheme();
     this.handleKeyEvents();
     this.initMenu();
     this.handleMenuKeybindChange();
     this.handleMenuInputChanges();
+    this.handleMenuSelectChanges();
     this.handleTabChanges();
     this.handleSearch();
     this.menu.querySelector(".juice.tab").click();
   }
 
   setVersion() {
-    this.menu.querySelector(".ver").innerText = `v${version}`;
+    this.menu.querySelectorAll(".ver").forEach((element) => {
+      element.innerText = `v${version}`;
+    });
   }
 
   setKeybind() {
@@ -64,6 +70,10 @@ class Menu {
     }
   }
 
+  setTheme() {
+    this.menu.querySelector(".menu").setAttribute("data-theme", this.settings.menu_theme);
+  }
+
   handleKeyEvents() {
     document.addEventListener("keydown", (e) => {
       if (e.code === this.settings.menu_keybind) {
@@ -79,6 +89,7 @@ class Menu {
 
   initMenu() {
     const inputs = this.menu.querySelectorAll("input[data-setting]");
+    const selects = this.menu.querySelectorAll("select[data-setting]");
     inputs.forEach((input) => {
       const setting = input.dataset.setting;
       const type = input.type;
@@ -88,6 +99,12 @@ class Menu {
       } else {
         input.value = value;
       }
+    });
+
+    selects.forEach((select) => {
+      const setting = select.dataset.setting;
+      const value = this.settings[setting];
+      select.value = value;
     });
   }
 
@@ -121,10 +138,34 @@ class Menu {
     document.dispatchEvent(event);
   }
 
+
   handleMenuInputChanges() {
     const inputs = this.menu.querySelectorAll("input[data-setting]");
     inputs.forEach((input) => {
       input.addEventListener("change", () => this.handleMenuInputChange(input));
+    });
+  }
+
+  handleMenuSelectChange(select) {
+    const setting = select.dataset.setting;
+    const value = select.value;
+    this.settings[setting] = value;
+    ipcRenderer.send("update-setting", setting, value);
+    const event = new CustomEvent("juice-settings-changed", {
+      detail: { setting: setting, value: value },
+    });
+    if (setting === "menu_theme") {
+      this.setTheme();
+    }
+    document.dispatchEvent(event);
+  }
+
+  handleMenuSelectChanges() {
+    const selects = this.menu.querySelectorAll("select[data-setting]");
+    selects.forEach((select) => {
+      select.addEventListener("change", () =>
+        this.handleMenuSelectChange(select)
+      );
     });
   }
 

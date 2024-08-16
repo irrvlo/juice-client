@@ -12,29 +12,37 @@ Windows and MacOS releases are available. Linux will come if requested enough.
 # What features does this have?
 
 - Uncapped FPS
+- Resource Swapper
+- Userscripts
+- Automatic Updates
 - Discord Rich Presence
-- Custom menu with changeable keybind
-- Join Game Button
+- Custom Menu with Themes and Custom Keybinds
 - Permanent Crosshair
-- Custom Hitmarker (Using Link)
-- Custom CSS (Using Link) with toggle
-- Rave mode (RGB)
+- Custom Hitmarker (Using Links and Local File Paths)
+- Custom Kill Icon (Using Links and Local File Paths)
+- Custom CSS (Using Links and Local File Paths) with toggle
+- Rave Mode (RGB)
 - Hide Chat
 - Hide Interface
-- UI Animations
+- UI Animations Toggle
 - Skip Loading Screen
-- Interface opacity and bounds
+- Interface Opacity and Bounds
 - Auto Fullscreen
 - Experimental Flags
-- more to come :)
+- Pack/Chest Auto Opener
+- Shift Clicking a username in Global Chat will open their profile
+- Map Images in Server List
+- Unofficial News in Lobby
+- No Pulp (aka smooth)
 
 ## Hotkeys
 | Hotkey | Description |
 | ------ | ----------- |
-| F3 | Quick Queue |
+| F2 | Screenshot and copy to clipboard |
 | F4 | Return to https://kirka.io |
 | F5 | Reload |
 | F6 | Load URL |
+| F7 | Copy URL |
 | F11 | Fullscreen |
 | F12 & Ctrl + Shift + I | Open DevTools |
 

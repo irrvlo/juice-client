@@ -3,6 +3,11 @@ const isPackaged = require('electron-is-packaged').isPackaged;
 const { autoUpdater } = require("electron-updater");
 const { initGame } = require("./game");
 const path = require("path");
+const log = require("electron-log");
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.autoDownload = true;
 
 autoUpdater.setFeedURL({
   provider: "github",
@@ -29,58 +34,65 @@ const createWindow = () => {
   splashWindow.loadFile(path.join(__dirname, "../assets/html/splash.html"));
   splashWindow.once("ready-to-show", () => {
     splashWindow.show();
+    if (isPackaged) {
+      checkForUpdates();
+    } else {
+      handleClose();
+    }
   });
 
   splashWindow.on("closed", () => {
-    ipcMain.removeAllListeners("check-for-updates");
-    ipcMain.removeAllListeners("quit-and-install");
     splashWindow = null;
   });
 };
 
-const checkForUpdates = async () => {
-  ipcMain.on("check-for-updates", async () => {
-    await autoUpdater.checkForUpdates();
-  });
-
-  ipcMain.on("quit-and-install", () => {
-    setTimeout(() => {
-      autoUpdater.quitAndInstall();
-    }, 5000);
-  });
+const checkForUpdates = () => {
+  log.info("Checking for updates...");
 
   autoUpdater.on("update-available", () => {
+    log.info("Update available! Attempting download...");
     splashWindow.webContents.send("update-available");
   });
 
   autoUpdater.on("update-not-available", () => {
+    log.info("No updates available. Launching...");
     splashWindow.webContents.send("update-not-available");
     handleClose();
   });
 
   autoUpdater.on("update-downloaded", () => {
+    log.info("Update downloaded!");
     splashWindow.webContents.send("update-downloaded");
   });
 
   autoUpdater.on("download-progress", (progress) => {
+    log.info(`Downloading update: ${Math.round(progress.percent)}%`);
     splashWindow.webContents.send("download-progress", progress);
+  });
+
+  autoUpdater.on("error", (error) => {
+    log.error(`Error in auto-updater: ${error}`);
+    splashWindow.webContents.send("update-error", error.message);
+    handleClose();
+  });
+
+  autoUpdater.checkForUpdates().catch((err) => {
+    log.error(`Failed to check for updates: ${err.message}`);
+    handleClose();
   });
 };
 
 const handleClose = () => {
   setTimeout(() => {
-    initGame();
-    splashWindow.close();
-  }, 3000);
+    if (splashWindow) {
+      initGame();
+      splashWindow.close();
+    }
+  }, 2000);
 };
 
 const initSplash = () => {
-  console.log(isPackaged ? 'Checking for updates...' : 'Running unpacked, skipped update check...');
-  if (isPackaged) {
-    checkForUpdates();
-  } else {
-    handleClose();
-  }
+  log.info(isPackaged ? 'Checking for updates...' : 'Running unpacked, skipped update check...');
   createWindow();
 };
 

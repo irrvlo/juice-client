@@ -5,23 +5,70 @@
 <style>
   @import url("https://fonts.cdnfonts.com/css/satoshi");
 
-  :root {
+  .menu[data-theme="dark"] {
     --dark: 20, 20, 20;
-    --white: 255, 255, 255;
-    --orange: #ff932d;
-    --green: #acfa70;
+    --light: 255, 255, 255;
+    --orange: 255, 147, 45;
+    --green: 172, 250, 112;
+    --blue: 88, 101, 242;
+    --red: 255, 0, 0;
+    --hover-dark: 31, 31, 31;
+    --hover-light: 255, 255, 255, 0.05;
+    --border: 255, 255, 255, 0.15;
+    --border-active: 255, 255, 255, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 255, 255, 0.5;
+    --opacity-quarter: 255, 255, 255, 0.25;
+  }
+
+  .menu[data-theme="light"] {
+    --dark: 202, 253, 211;
+    --light: 0, 0, 0;
+    --orange: 255, 185, 120;
+    --green: 172, 250, 112;
+    --blue: 88, 101, 242;
+    --red: 255, 0, 0;
+    --hover-dark: 202, 253, 211;
+    --hover-light: 0, 0, 0, 0.05;
+    --border: 0, 0, 0, 0.15;
+    --border-active: 0, 0, 0, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 0, 0, 0, 0.5;
+    --opacity-quarter: 0, 0, 0, 0.25;
+  }
+
+  .menu[data-theme="legacy"] {
+    background: linear-gradient(to bottom, rgba(var(--green), .8), rgba(var(--orange), .8));
+    backdrop-filter: blur(5px);
+    --dark: 255,255,255;
+    --light: 255,255,255;
+    --orange: 255, 147, 45;
+    --green: 172, 250, 112;
+    --blue: 88, 101, 242;
+    --red: 255, 0, 0;
+    --hover-dark: 255, 255, 255;
+    --hover-light: 0, 0, 0, 0.05;
+    --border: 255, 255, 255, 0.15;
+    --border-active: 0, 0, 0, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 255, 255, 0.5;
+    --opacity-quarter: 255, 255, 255, 0.25;
+  }
+
+  .menu[data-theme="legacy"] option {
+    color: black;
   }
 
   .menu ::-webkit-scrollbar {
     display: none;
   }
-
+  
   /*
   .nickname {
     background: linear-gradient(45deg, blue, red);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;
+    text-shadow: 0 0 5px rgba(var(--red), 0.5) !important;
   }
   */
 
@@ -38,16 +85,24 @@
     font-family: "Font Awesome 6 Free" !important;
   }
 
+  .menu .sidebar i {
+    width: 1.25rem;
+  }
+
+  .menu a > i {
+    font-family: "Font Awesome 6 Brands" !important;
+  }
+
   .menu {
     font-family: "Satoshi", sans-serif;
     display: none;
     width: 55rem;
-    height: 35rem;
+    height: 36rem;
     background: rgba(var(--dark), 1);
     border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 1rem rgba(var(--dark), 0.5);
-    color: white;
+    border: 1px solid rgba(var(--border));
+    box-shadow: 0 0 1rem rgba(var(--shadow));
+    color: rgba(var(--light), 1);
     grid-template-columns: 1.25fr 2.75fr;
     grid-template-rows: 100%;
     grid-template-areas: "sidebar content";
@@ -76,14 +131,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(var(--border));
     border-radius: 1rem;
     cursor: pointer;
     transition: background 0.3s;
   }
 
   .menu .checkbox input:checked + label {
-    background: var(--orange);
+    background: rgba(var(--orange));
   }
 
   .menu .checkbox label:after {
@@ -116,15 +171,15 @@
     height: 2.5rem;
     padding: 0 1rem;
     background: rgba(var(--dark), 0.1);
-    border: 0.1rem solid rgba(255, 255, 255, 0.25);
+    border: 0.1rem solid rgba(var(--border));
     border-radius: 0.5rem;
-    color: white;
+    color: rgb(var(--light));
     font-family: "Satoshi", sans-serif;
     outline: none;
   }
 
   .menu input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(var(--opacity-half));
   }
 
   .menu .footer {
@@ -132,7 +187,7 @@
     margin-top: auto;
     display: flex;
     flex-direction: column;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(var(--opacity-half));
     font-size: 0.9rem;
   }
 
@@ -160,7 +215,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(var(--opacity-half));
     border: 0.1rem solid transparent;
     cursor: pointer;
     transition: 0.2s;
@@ -168,20 +223,20 @@
   }
 
   .menu .juice.tab:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--hover-light));
   }
 
   .menu .juice.tab.active {
     background: rgba(var(--dark), 0.1);
-    color: white;
-    border: 0.1rem solid rgba(255, 255, 255, 0.15);
+    color: rgba(var(--light));
+    border: 0.1rem solid rgba(var(--border));
   }
 
   .menu .option-group {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(var(--hover-light));
     padding: 1rem;
     border-radius: 0.5rem;
   }
@@ -196,7 +251,7 @@
     appearance: none;
     width: 45%;
     height: 0.5rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(var(--border));
     border-radius: 0.25rem;
     outline: none;
     opacity: 0.7;
@@ -207,15 +262,34 @@
     appearance: none;
     width: 1rem;
     height: 1rem;
-    background: white;
+    background: rgba(var(--orange));
     border-radius: 50%;
     cursor: pointer;
+  }
+
+  .menu select {
+    width: 50%;
+    height: 2.5rem;
+    padding: 0 1rem;
+    background: rgba(var(--dark), 0.1);
+    border: 0.1rem solid rgba(var(--border));
+    border-radius: 0.5rem;
+    color: rgb(var(--light));
+    font-family: "Satoshi", sans-serif;
+    outline: none;
+    appearance: none;
+  }
+
+  .menu option {
+    background: rgba(var(--dark), 1);
+    height: 2.5rem;
+    color: rgb(var(--light));
   }
 
   .menu .restart:after,
   .menu .requires-restart > span:after {
     content: "*";
-    color: red;
+    color: rgba(var(--red));
     margin-left: 0.25rem;
   }
 
@@ -225,34 +299,36 @@
     height: 2.5rem;
     padding: 0 1rem;
     background: rgba(var(--dark), 0.1);
-    border: 0.1rem solid rgba(255, 255, 255, 0.15);
+    border: 0.1rem solid rgba(var(--border));
     border-radius: 0.5rem;
-    color: white;
+    color: rgb(var(--light));
     font-family: "Satoshi", sans-serif;
     outline: none;
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    flex-shrink: 0;
   }
 
   .menu .search-input input {
     background: transparent;
     border: none;
-    color: white;
+    color: rgb(var(--light));
     font-family: "Satoshi", sans-serif;
     outline: none;
   }
 
   .menu .search-input i {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(var(--opacity-half));
     font-size: 0.75rem;
   }
 
   .menu .sep {
     width: 100%;
     height: 1px;
-    margin: 1.5rem 0;
-    background: rgba(255, 255, 255, 0.15);
+    margin: 0.75rem 0;
+    background: rgba(var(--border));
+    flex-shrink: 0;
   }
 
   .menu .sidebar {
@@ -260,30 +336,140 @@
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    border-right: rgba(255, 255, 255, 0.15) 1px solid;
+    border-right: rgba(var(--border)) 1px solid;
   }
 
   .menu .tab-group {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .menu .change-keybind {
-    width: 5rem;
-    height: 1.5rem;
-    background: rgba(255, 255, 255, 0.15);
-    border: 0.1rem solid rgba(255, 255, 255, 0.25);
-    border-radius: 0.25rem;
-    font-size: 0.85rem;
-    color: white;
+    width: fit-content;
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(var(--dark), 0.1);
+    border: 0.1rem solid rgba(var(--border));
+    border-radius: 0.5rem;
+    color: rgba(var(--opacity-half));
+    cursor: pointer;
+    transition: 0.2s;
     font-family: "Satoshi", sans-serif;
     outline: none;
-    cursor: pointer;
+  }
+
+  .menu .change-keybind:hover {
+    background: rgba(var(--hover-light));
+  }
+
+  .menu .change-keybind.active {
+    color: rgba(var(--opacity-half));
+    background: rgba(var(--border-active));
+  }
+
+  .menu .sidebar span {
+    font-size: 0.8rem;
+    color: rgba(var(--opacity-half));
+  }
+
+  .about-top {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 1rem;
+  }
+
+  .about-top img {
+    width: 6rem;
+    height: 6rem;
+    object-fit: contain;
+    -webkit-user-drag: none;
+  }
+
+  .about-top .about-info {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .about-top .title {
+    display: flex;
+    font-size: 3rem;
+  }
+
+  .about-info .about-more {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .about-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .about-buttons a {
+    display: grid;
+    place-items: center;
+    color: white;
+    text-decoration: none;
+    position: relative;
+    border-radius: 0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.25rem;
+    transition: 0.2s;
+  }
+
+  .about-buttons a .custom-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0.2rem solid rgba(255, 255, 255, 0.25);
+    border-radius: 0.5rem;
+  }
+
+  .about-discord {
+    background: #5865f2;
+  }
+
+  .about-discord:hover {
+    background: #626ffc;
+  }
+
+  .about-github {
+    background: #141414;
+  }
+
+  .about-github:hover {
+    background: #1f1f1f;
+  }
+
+  .about-kirka {
+    background: #37477c;
+  }
+
+  .about-kirka:hover {
+    background: #3f518d;
+  }
+
+  .about-kirka img {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+  }
+
+  .author {
+    color: rgba(var(--light), 0.5);
   }
 </style>
 
-<div class="menu" data-active="true">
+<div class="menu" data-theme="dark" data-active="true">
   <aside class="sidebar">
     <div class="search-input">
       <i class="fas fa-search"></i>
@@ -309,6 +495,14 @@
       <div data-tab="misc" class="juice tab">
         <i class="fas fa-cog"></i>
         Miscellaneous
+      </div>
+      <div data-tab="scripts" class="juice tab">
+        <i class="fas fa-file-code"></i>
+        Scripts
+      </div>
+      <div data-tab="about" class="juice tab">
+        <i class="fas fa-circle-info"></i>
+        About
       </div>
     </div>
     <div class="footer">
@@ -418,6 +612,14 @@
             data-setting="hitmarker_link"
           />
         </div>
+        <div class="option">
+          <span>Kill Icon Link</span>
+          <input
+            type="text"
+            placeholder="https://.../.png"
+            data-setting="killicon_link"
+          />
+        </div>
       </div>
       <div class="option-group">
         <div class="option">
@@ -495,6 +697,75 @@
         <div class="option custom">
           <span>Menu Toggle Keybind</span>
           <button class="juice change-keybind"></button>
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="option">
+          <span>Menu Theme</span>
+          <select id="menu_theme" data-setting="menu_theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="legacy">Legacy</option>
+          </select>
+          </div>
+      </div>
+    </div>
+    <div id="scripts-options" class="juice options">
+      <div class="option-group">
+        <div class="option">
+          <span>Pack/Chest Opener</span>
+          <select id="opener">
+              <option value="none">None</option>
+              <option value="Chest_Golden">Golden</option>
+              <option value="Chest_Ice">Ice</option>
+              <option value="Chest_Wood">Wood</option>
+              <option value="Chest_All">All Chests</option>
+              <option value="Card_Cold">Cold</option>
+              <option value="Card_Girlsband">Girls band</option>
+              <option value="Card_Party">Party</option>
+              <option value="Card_Soldiers">Soldiers</option>
+              <option value="Card_Periodic">Periodic</option>
+              <option value="Card_All">All Cards</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="about-client" class="juice options">
+        <div class="option-group">
+          <div class="about-top">
+            <img src="https://juice.irrvlo.xyz/juice.png" />
+            <div class="about-info">
+              <span class="title">Juice Client</span>
+              <div class="about-more">
+                <div>
+                  <span class="ver"></span>
+                  <span class="author">by irrvlo</span>
+                </div>
+                <div class="about-buttons">
+                  <a href="https://kirka.io/profile/H8N3U4" class="about-kirka">
+                    <img src="https://kirka.io/favicon.ico" />
+                    <div class="custom-border"></div>
+                  </a>
+                  <a
+                    href="https://discord.gg/FjzAAdSjng"
+                    target="_blank"
+                    class="about-discord"
+                  >
+                    <i class="fab fa-discord"></i>
+                    <div class="custom-border"></div>
+                  </a>
+                  <a
+                    href="https://github.com/irrvlo/juice-client"
+                    target="_blank"
+                    class="about-github"
+                  >
+                    <i class="fab fa-github"></i>
+                    <div class="custom-border"></div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

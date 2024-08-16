@@ -1,27 +1,32 @@
 const version = require("../../package.json").version;
+const clientid = "1233829658345078846";
+const rpc = require("discord-rpc");
 
 const initRPC = () => {
-  class RPC {
-    constructor() {
-      this.client = new (require("discord-rpc-revamp").Client)();
-      this.client.connect({ clientId: "1233829658345078846" }).catch();
-      this.client.on("ready", () => {
-        this.client
-          .setActivity({
-            startTimestamp: Date.now(),
-            largeImageKey: "juice",
-            largeImageText: `Juice Client v${version}`,
-            buttons: [
-              { label: "Download", url: "https://juice.irrvlo.xyz" },
-              { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },
-            ],
-          })
-          .catch();
-      });
-    }
-  }
+  const client = new rpc.Client({ transport: "ipc" });
 
-  new RPC();
+  client.on("ready", () => {
+    client.request("SET_ACTIVITY", {
+      pid: process.pid,
+      activity: {
+        timestamps: { start: Date.now() },
+        assets: {
+          large_image: "juice",
+          large_text: `Juice Client v${version}`,
+        },
+        buttons: [
+          { label: "Download", url: "https://juice.irrvlo.xyz" },
+          { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },
+        ],
+      },
+    });
+  });
+
+  client.on("disconnected", () => {
+    client.login({ clientId: clientid }).catch(console.error);
+  });
+
+  client.login({ clientId: clientid }).catch(console.error);
 };
 
 module.exports = { initRPC };

@@ -19,15 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   ipcRenderer.on("update-not-available", () => {
-    updateStatus("No updates available.");
+    updateStatus("No updates available. Launching...");
   });
 
   ipcRenderer.on("update-downloaded", () => {
-    updateStatus("Update downloaded. Installing...");
+    updateStatus("Update downloaded! Installing...");
     ipcRenderer.send("quit-and-install");
   });
 
   ipcRenderer.on("download-progress", (e, progress) => {
-    updateStatus(`Downloading update... ${progress.percent}%`);
+    updateStatus(`Downloading update: ${Math.round(progress.percent)}%`);
   });
 });
