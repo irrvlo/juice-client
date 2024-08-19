@@ -53,5 +53,5 @@ Juice Client is 100% completely safe to use. Releases are built directly with th
 ## Credits
 
 - irrvlo
-- CarrySheriff for Chest/Pack opener and Map Images
+- CarrySheriff for Chest/Pack opener and Map Images Repo
 - Sam for a basic Resource Swapper
