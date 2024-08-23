@@ -89,7 +89,7 @@
     width: 1.25rem;
   }
 
-  .menu a > i {
+  .menu i.fab {
     font-family: "Font Awesome 6 Brands" !important;
   }
 
@@ -157,7 +157,7 @@
     left: 1.75rem;
   }
 
-  .menu .content {
+  .menu > .content {
     grid-area: content;
     display: flex;
     flex-direction: column;
@@ -201,6 +201,7 @@
     display: none;
     gap: 1rem;
     flex-direction: column;
+    height: 100%;
   }
 
   .menu .juice.options.active {
@@ -241,10 +242,55 @@
     border-radius: 0.5rem;
   }
 
+  .menu .option-group.bottom {
+    margin-top: auto;
+  }
+
   .menu .option {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .menu .option.dropdown {
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+
+  .menu .option.dropdown .content {
+    height: 0;
+    width: 100%;
+    transition: 0.2s ease;
+  }
+
+  .menu .option.dropdown.active .content {
+    margin-top: 1rem;
+    height: 100%;
+  }
+
+  .menu .option.dropdown i {
+    transition: 0.2s;
+    transform: rotate(-90deg);
+  }
+  
+  .menu .option.dropdown.active i {
+    transform: rotate(0deg);
+  }
+
+  .menu textarea {
+    min-height: 4rem;
+    width: 100%;
+    resize: vertical;
+    padding: 0.5rem;
+    background: rgba(var(--dark), 0.2);
+    border: 0.1rem solid rgba(var(--border));
+    border-radius: 0.25rem;
+    color: rgb(var(--light));
+    font-family: "Satoshi", sans-serif;
+    outline: none;
+    transition: 0.2s ease;
   }
 
   .menu .range {
@@ -389,10 +435,21 @@
     -webkit-user-drag: none;
   }
 
+  .about-top.compact img {
+    width: 3rem;
+    height: 3rem;
+  }
+
   .about-top .about-info {
     display: flex;
     width: 100%;
     flex-direction: column;
+  }
+
+  .about-top.compact .about-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem
   }
 
   .about-top .title {
@@ -400,7 +457,13 @@
     font-size: 3rem;
   }
 
+  .about-top.compact .title {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
   .about-info .about-more {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -412,8 +475,10 @@
   }
 
   .about-buttons a {
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
     color: white;
     text-decoration: none;
     position: relative;
@@ -422,6 +487,12 @@
     height: 2.75rem;
     font-size: 1.25rem;
     transition: 0.2s;
+  }
+
+  .about-buttons a.alt {
+    font-size: 0.95rem !important;
+    padding: 0 1rem;
+    width: max-content !important;
   }
 
   .about-buttons a .custom-border {
@@ -462,6 +533,22 @@
     width: 1.5rem;
     height: 1.5rem;
     object-fit: contain;
+  }
+
+  .about-kirkatools {
+    background: rgb(31 7 0);
+  }
+
+  .about-kirkatools:hover {
+    background: rgb(41 9 0);
+  }
+
+  .about-juice {
+    background: rgba(var(--orange));
+  }
+
+  .about-juice:hover {
+    background: rgba(var(--orange), 0.9);
   }
 
   .author {
@@ -535,6 +622,18 @@
             placeholder="https://.../.css"
             data-setting="css_link"
           />
+        </div>
+        <div class="option dropdown">
+          <div class="top">
+            <i class="fas fa-angle-down"></i>
+            <span>Advanced CSS</span>
+          </div>
+          <div class="content">
+            <textarea
+              placeholder="input css here"
+              data-setting="advanced_css"
+            ></textarea>
+          </div>
         </div>
       </div>
       <div class="option-group">
@@ -619,6 +718,19 @@
             placeholder="https://.../.png"
             data-setting="killicon_link"
           />
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="option">
+          <span>K/D Indicator</span>
+          <div class="checkbox">
+            <input
+              type="checkbox"
+              id="kd_indicator"
+              data-setting="kd_indicator"
+            />
+            <label for="kd_indicator"></label>
+          </div>
         </div>
       </div>
       <div class="option-group">
@@ -760,6 +872,44 @@
                     class="about-github"
                   >
                     <i class="fab fa-github"></i>
+                    <div class="custom-border"></div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="about-top compact">
+            <img src="https://juice.irrvlo.xyz/irrvlo_k.png" />
+            <div class="about-info compact">
+              <span class="title">Kirka Tools</span>
+              <div class="about-more">
+                <div>
+                </div>
+                <div class="about-buttons">
+                  <a href="https://kirka.irrvlo.xyz" class="about-kirkatools alt">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                    <p>Check it out!</p>
+                    <div class="custom-border"></div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="option-group">
+          <div class="about-top compact">
+            <img src="https://juice.irrvlo.xyz/bubbles.png" />
+            <div class="about-info compact">
+              <span class="title">Patch Notes</span>
+              <div class="about-more">
+                <div>
+                </div>
+                <div class="about-buttons">
+                  <a href="https://juice.irrvlo.xyz/patch-notes" class="about-juice alt">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                    <p>View</p>
                     <div class="custom-border"></div>
                   </a>
                 </div>

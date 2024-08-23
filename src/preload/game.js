@@ -4,6 +4,16 @@ const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
+const scriptsPath = ipcRenderer.sendSync("get-scripts-path");
+const scripts = fs.readdirSync(scriptsPath);
+
+scripts.forEach((script) => {
+  if (!script.endsWith(".js")) return;
+
+  const scriptPath = path.join(scriptsPath, script);
+  require(scriptPath);
+});
+
 if (!window.location.href.startsWith("https://kirka.io")) {
   Object.defineProperty(navigator, "userAgent", {
     get: () =>
@@ -14,15 +24,6 @@ if (!window.location.href.startsWith("https://kirka.io")) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const scriptsPath = ipcRenderer.sendSync("get-scripts-path");
-  const scripts = fs.readdirSync(scriptsPath);
-  scripts.forEach((script) => {
-    if (!script.endsWith(".js")) return;
-
-    const scriptPath = path.join(scriptsPath, script);
-    require(scriptPath);
-  });
-
   const menu = new Menu();
   menu.init();
 
@@ -67,10 +68,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       div.style = `
         width: 100%;
         border: 4px solid #3e4d7c;
-        border-bottom: solid 4px var(--wNmWnwMW-6);
+        border-bottom: solid 4px #26335b;
         border-top: 4px solid #4d5c8b;
-        background-color: var(--wNmWnwMW-5);
+        background-color: #3b4975;
         display: flex;
+        position: relative;
         ${newsItem.link ? "cursor: pointer;" : ""}
         ${newsItem.imgType === "banner" ? "flex-direction: column;" : ""}
       `;
@@ -79,6 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const addImage = () => {
         const img = document.createElement("img");
+        img.className = `news-img ${newsItem.imgType}`;
         img.src = newsItem.img;
         img.style = `
           width: ${newsItem.imgType === "banner" ? "100%" : "4rem"};
@@ -89,8 +92,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.appendChild(img);
       };
 
+      const addNew = () => {
+        const newSpan = document.createElement("span");
+        newSpan.className = "new";
+        newSpan.innerText = "NEW";
+        newSpan.style = `
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: #e24f4f;
+          color: #fff;
+          padding: 0.1rem 0.25rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 0 0 0 0.25rem;
+        `;
+        div.appendChild(newSpan);
+      };
+
       const addContent = () => {
         const content = document.createElement("div");
+        content.className = "news-container";
         content.style = `
           padding: 0.5rem;
           display: flex;
@@ -100,17 +122,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
 
         const title = document.createElement("span");
+        title.className = "news-title";
         title.innerText = newsItem.title;
         title.style = `
           font-size: 1.2rem;
           font-weight: 600;
           color: #fff;
           margin: 0;
-          color: var(--WwmMNWnw-1);
+          color: #ffb914;
         `;
         content.appendChild(title);
 
         const text = document.createElement("span");
+        text.className = "news-content";
         text.innerText = newsItem.content;
         text.style = `
           font-size: 0.9rem;
@@ -123,6 +147,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       if (newsItem.img && newsItem.img !== "") addImage();
+
+      if (newsItem.updatedAt && newsItem.updatedAt > Date.now() - 432000000) {
+        addNew();
+      }
       addContent();
 
       if (newsItem.link) {
@@ -180,21 +208,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     addedStyles.id = "juice-styles-theme";
     document.head.appendChild(addedStyles);
 
+    const customStyles = document.createElement("style");
+    customStyles.id = "juice-styles-custom";
+    document.head.appendChild(customStyles);
+
     const updateTheme = () => {
       const settings = ipcRenderer.sendSync("get-settings");
       const cssLink = settings.css_link;
+      const advancedCSS = settings.advanced_css;
 
       if (cssLink && settings.css_enabled) {
         addedStyles.innerHTML = `@import url('${formatLink(cssLink)}');`;
       } else {
         addedStyles.innerHTML = "";
       }
+
+      customStyles.innerHTML = advancedCSS;
     };
 
     document.addEventListener("juice-settings-changed", (e) => {
       if (
         e.detail.setting === "css_link" ||
-        e.detail.setting === "css_enabled"
+        e.detail.setting === "css_enabled" ||
+        e.detail.setting === "advanced_css"
       ) {
         updateTheme();
       }
@@ -355,6 +391,134 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
+  const handleProfile = () => {
+    console.log("profile");
+    const interval = setInterval(() => {
+      if (!window.location.href.startsWith("https://kirka.io/profile")) {
+        clearInterval(interval);
+      }
+
+      if (document.querySelector(".profile > .content")) {
+        clearInterval(interval);
+
+        const content = document.querySelector(".profile > .content");
+        const statistics = document.querySelectorAll(".statistic");
+
+        let kills;
+        let deaths;
+
+        statistics.forEach((stat) => {
+          const name = stat.querySelector(".stat-name").innerText;
+          const value = stat.querySelector(".stat-value").innerText;
+
+          if (name === "kills") {
+            kills = value;
+          }
+
+          if (name === "deaths") {
+            deaths = value;
+          }
+        });
+
+        const kloElem = content.querySelector(".card.k-d");
+
+        const kloClone = kloElem.cloneNode(true);
+        kloClone.querySelector(".v-popover").remove();
+        kloClone.querySelector(".stat-name").innerText = "K/D";
+        kloClone.querySelector(".stat-value").innerText = (
+          parseFloat(kills) / parseFloat(deaths)
+        ).toFixed(2);
+        const contentTop = content.querySelector(".top-medium > .top");
+
+        contentTop.insertBefore(kloClone, contentTop.children[1]);
+
+        kloElem.style.width = "unset";
+        kloClone.style.width = "unset";
+
+        if (window.location.href.includes("H8N3U4")) {
+          const profile = document.querySelector(".profile-cont > .profile");
+          profile.style.position = "relative";
+
+          const div = document.createElement("div");
+          div.style = `
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+          `;
+          div.innerHTML = `
+          <img src="https://juice.irrvlo.xyz/bubbles.png" style="height: 0.8rem; width: auto;" />
+          <span style="font-size: 1rem; font-weight: 600; color: #fff;">Juice Client Developer</span>
+          `;
+          profile.appendChild(div);
+        }
+      }
+    }, 250);
+  };
+
+  handleInGame = () => {
+    const settings = ipcRenderer.sendSync("get-settings");
+
+    const createKD = () => {
+      if (document.querySelector(".kill-death .kd")) return;
+      const kills = document.querySelector(".kill-death .kill");
+      const kd = kills.cloneNode(true);
+
+      kd.style.gap = "0.25rem";
+      kd.classList.add("kd");
+      kd.classList.remove("kill");
+      kd.innerHTML = `0 <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
+
+      document.querySelector(".kill-death").appendChild(kd);
+    };
+
+    if (settings.kd_indicator) {
+      createKD();
+    }
+
+    document.addEventListener("juice-settings-changed", (e) => {
+      if (e.detail.setting === "kd_indicator") {
+        if (e.detail.value === true) {
+          createKD();
+        } else {
+          if (document.querySelector(".kill-death .kd")) {
+            document.querySelector(".kill-death .kd").remove();
+          }
+        }
+      }
+    });
+
+    const interval = setInterval(() => {
+      if (!window.location.href.startsWith("https://kirka.io/games")) {
+        clearInterval(interval);
+        return;
+      }
+
+      const updateKD = () => {
+        const kills = document.querySelector(".kill-death .kill");
+        const deaths = document.querySelector(
+          "div > svg.icon-death"
+        ).parentElement;
+        const kd = document.querySelector(".kill-death .kd");
+
+        const killCount = parseFloat(kills.innerText);
+        const deathCount = parseFloat(deaths.innerText) || 1;
+
+        let kdRatio = (killCount / deathCount).toFixed(2);
+
+        kdRatio = parseFloat(kdRatio).toString();
+
+        kd.innerHTML = `${kdRatio} <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
+      };
+
+      if (document.querySelector(".kill-death .kd")) {
+        updateKD();
+      }
+    }, 500);
+  };
+
   const customNotification = (data) => {
     const notifElement = document.createElement("div");
     notifElement.classList.add("vue-notification-wrapper");
@@ -373,7 +537,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         border-radius: .2rem;
         background: linear-gradient(262.54deg,#202639 9.46%,#223163 100.16%);
         margin-left: 1rem;
-        border: solid .15rem var(--wwNnMWmW-1);
+        border: solid .15rem #ffb914;
         font-family: Exo\ 2;" class="alert-default"
     > ${
       data.icon
@@ -408,11 +572,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   ipcRenderer.on("url-change", (e, url) => {
+    console.log(url);
     if (url === "https://kirka.io/") {
       handleLobby();
     }
     if (url.startsWith("https://kirka.io/servers/")) {
       handleServers();
+    }
+    if (url.startsWith("https://kirka.io/profile/")) {
+      handleProfile();
+    }
+    if (url.startsWith("https://kirka.io/games/")) {
+      handleInGame();
     }
   });
 
@@ -421,10 +592,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (url.startsWith("https://kirka.io/") && !url.includes("games")) {
       handleLobby();
     }
-
     if (url.startsWith("https://kirka.io/servers/")) {
       handleServers();
     }
+    if (url.startsWith("https://kirka.io/profile/")) {
+      handleProfile();
+    }
+    if (url.startsWith("https://kirka.io/games/")) {
+      handleInGame();
+    }
+
     loadTheme();
     applyUIFeatures();
   };

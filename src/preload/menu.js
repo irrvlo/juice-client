@@ -43,8 +43,15 @@ class Menu {
     this.handleMenuInputChanges();
     this.handleMenuSelectChanges();
     this.handleTabChanges();
+    this.handleDropdowns();
     this.handleSearch();
-    this.menu.querySelector(".juice.tab").click();
+    this.localStorage.getItem("juice-menu-tab")
+      ? this.handleTabChange(
+          this.menu.querySelector(
+            `[data-tab="${this.localStorage.getItem("juice-menu-tab")}"]`
+          )
+        )
+      : this.handleTabChange(this.menu.querySelector(".juice.tab"));
   }
 
   setVersion() {
@@ -71,7 +78,9 @@ class Menu {
   }
 
   setTheme() {
-    this.menu.querySelector(".menu").setAttribute("data-theme", this.settings.menu_theme);
+    this.menu
+      .querySelector(".menu")
+      .setAttribute("data-theme", this.settings.menu_theme);
   }
 
   handleKeyEvents() {
@@ -89,6 +98,7 @@ class Menu {
 
   initMenu() {
     const inputs = this.menu.querySelectorAll("input[data-setting]");
+    const textareas = this.menu.querySelectorAll("textarea[data-setting]");
     const selects = this.menu.querySelectorAll("select[data-setting]");
     inputs.forEach((input) => {
       const setting = input.dataset.setting;
@@ -105,6 +115,12 @@ class Menu {
       const setting = select.dataset.setting;
       const value = this.settings[setting];
       select.value = value;
+    });
+
+    textareas.forEach((textarea) => {
+      const setting = textarea.dataset.setting;
+      const value = this.settings[setting];
+      textarea.value = value;
     });
   }
 
@@ -138,11 +154,17 @@ class Menu {
     document.dispatchEvent(event);
   }
 
-
   handleMenuInputChanges() {
     const inputs = this.menu.querySelectorAll("input[data-setting]");
+    const textareas = this.menu.querySelectorAll("textarea[data-setting]");
     inputs.forEach((input) => {
       input.addEventListener("change", () => this.handleMenuInputChange(input));
+    });
+
+    textareas.forEach((textarea) => {
+      textarea.addEventListener("change", () =>
+        this.handleMenuInputChange(textarea)
+      );
     });
   }
 
@@ -178,6 +200,10 @@ class Menu {
 
   handleTabChange(tab) {
     const tabs = this.menu.querySelectorAll(".juice.tab");
+    const tabName = tab.dataset.tab;
+
+    this.localStorage.setItem("juice-menu-tab", tabName);
+
     const contents = this.menu.querySelectorAll(".juice.options");
     tabs.forEach((tab) => {
       tab.classList.remove("active");
@@ -187,6 +213,16 @@ class Menu {
     });
     tab.classList.add("active");
     this.tabToContentMap[tab.dataset.tab].classList.add("active");
+  }
+
+  handleDropdowns() {
+    const dropdowns = this.menu.querySelectorAll(".dropdown");
+    dropdowns.forEach((dropdown) => {
+      const dropdownTop = dropdown.querySelector(".dropdown .top");
+      dropdownTop.addEventListener("click", () => {
+        dropdown.classList.toggle("active");
+      });
+    });
   }
 
   handleSearch() {
