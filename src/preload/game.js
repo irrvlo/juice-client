@@ -344,6 +344,76 @@ document.addEventListener("DOMContentLoaded", async () => {
   const handleLobby = () => {
     lobbyNews();
     juiceDiscordButton();
+
+    const formatMoney = (money) => {
+      if (!money.dataset.formatted) {
+        const formatted = parseInt(money.innerText).toLocaleString();
+        money.innerHTML = money.innerHTML.replace(money.innerText, formatted);
+        money.dataset.formatted = true;
+      }
+    };
+
+    const formatExpValues = (expValues) => {
+      if (!expValues.dataset.formatted) {
+        const [current, max] = expValues.innerText.split("/");
+        expValues.innerText = `${parseInt(current).toLocaleString()}/${parseInt(
+          max
+        ).toLocaleString()}`;
+        expValues.dataset.formatted = true;
+      }
+    };
+
+    const formatQuests = () => {
+      const quests = document.querySelectorAll(
+        ".right-interface > .quests .quest"
+      );
+
+      quests.forEach((quest) => {
+        const amounts = quest.querySelectorAll(".amount");
+        const progress2 = quest.querySelector(".progress2");
+
+        if (progress2 && !progress2.dataset.formatted) {
+          const [progressAmt, progressMax] = progress2.innerText.split("/");
+          progress2.innerText = `${parseInt(
+            progressAmt
+          ).toLocaleString()}/${parseInt(progressMax).toLocaleString()}`;
+          progress2.dataset.formatted = true;
+        }
+
+        amounts.forEach((amount) => {
+          if (!amount.dataset.formatted) {
+            const formatted = parseInt(
+              amount.innerText.split(" ")[0]
+            ).toLocaleString();
+            amount.innerHTML = amount.innerHTML.replace(
+              amount.innerText.split(" ")[0],
+              formatted
+            );
+            amount.dataset.formatted = true;
+          }
+        });
+      });
+    };
+
+    const interval = setInterval(() => {
+      const moneys = document.querySelectorAll(".moneys > .card-cont");
+      const expValues = document.querySelector(".exp-values");
+      const quests = document.querySelectorAll(
+        ".right-interface > .quests .quest"
+      );
+      const questsTabs = document.querySelector(
+        ".right-interface > .quests .tabs"
+      );
+
+      if (moneys.length && expValues && quests.length && questsTabs) {
+        clearInterval(interval);
+        moneys.forEach(formatMoney);
+        formatExpValues(expValues);
+        formatQuests();
+
+        questsTabs.addEventListener("click", formatQuests);
+      }
+    }, 100);
   };
 
   const handleServers = async () => {
@@ -403,6 +473,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const content = document.querySelector(".profile > .content");
         const statistics = document.querySelectorAll(".statistic");
+        const progressExp = document.querySelector(".progress-exp");
+
+        if (progressExp) {
+          const [current, max] = progressExp.innerText.split("/");
+          progressExp.innerText = `${parseInt(
+            current
+          ).toLocaleString()}/${parseInt(max).toLocaleString()}`;
+        }
 
         let kills;
         let deaths;
@@ -418,6 +496,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (name === "deaths") {
             deaths = value;
           }
+
+          stat.querySelector(".stat-value").innerText = value.replace(
+            value.split(" ")[0],
+            parseInt(value.split(" ")[0]).toLocaleString()
+          );
         });
 
         const kloElem = content.querySelector(".card.k-d");
@@ -519,6 +602,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 500);
   };
 
+  const handleMarket = () => {
+    const interval = setInterval(() => {
+      if (!window.location.href === "https://kirka.io/hub/market") {
+        clearInterval(interval);
+      }
+      const subjects = document.querySelectorAll(".subject");
+      subjects.forEach((subject) => {
+        const count = subject.querySelector(".count");
+        if (count && !count.dataset.formatted) {
+          count.innerHTML = count.innerHTML.replace(
+            count.innerText,
+            parseInt(count.innerText).toLocaleString()
+          );
+          count.dataset.formatted = true;
+        }
+      });
+    }, 250);
+  };
+
   const customNotification = (data) => {
     const notifElement = document.createElement("div");
     notifElement.classList.add("vue-notification-wrapper");
@@ -585,6 +687,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (url.startsWith("https://kirka.io/games/")) {
       handleInGame();
     }
+    if (url === "https://kirka.io/hub/market") {
+      handleMarket();
+    }
   });
 
   const handleInitialLoad = () => {
@@ -600,6 +705,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (url.startsWith("https://kirka.io/games/")) {
       handleInGame();
+    }
+    if (url === "https://kirka.io/hub/market") {
+      handleMarket();
     }
 
     loadTheme();
