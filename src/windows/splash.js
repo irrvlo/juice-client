@@ -42,9 +42,16 @@ const createWindow = () => {
   });
 
   splashWindow.on("closed", () => {
+    ipcMain.removeAllListeners("quit-and-install");
     splashWindow = null;
   });
 };
+
+ipcMain.on("quit-and-install", () => {
+  setTimeout(() => {
+    autoUpdater.quitAndInstall();
+  }, 5000);
+});
 
 const checkForUpdates = () => {
   log.info("Checking for updates...");
