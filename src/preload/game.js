@@ -29,6 +29,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   opener();
 
+  const fetchCustomizations = async () => {
+    const customizations = await fetch(
+      "https://juice-api.irrvlo.xyz/api/customizations"
+    ).then((res) => res.json());
+
+    localStorage.setItem(
+      "juice-customizations",
+      JSON.stringify(customizations)
+    );
+  };
+  fetchCustomizations();
+
+  const fetchCurrentUser = async () => {
+    const user = await fetch("https://api.kirka.io/api/user", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => res.json());
+
+    if (user.statusCode === 401) {
+      localStorage.setItem("current-user", JSON.stringify({}));
+    } else {
+      localStorage.setItem("current-user", JSON.stringify(user));
+    }
+  };
+  fetchCurrentUser();
+
   const formatLink = (link) => {
     return link.replace(/\\/g, "/");
   };
@@ -345,6 +372,72 @@ document.addEventListener("DOMContentLoaded", async () => {
     lobbyNews();
     juiceDiscordButton();
 
+    const customizations = JSON.parse(
+      localStorage.getItem("juice-customizations")
+    );
+    const currentUser = JSON.parse(localStorage.getItem("current-user"));
+
+    if (customizations?.find((c) => c.shortId === currentUser?.shortId)) {
+      const customs = customizations.find(
+        (c) => c.shortId === currentUser.shortId
+      );
+      const lobbyNickname = document.querySelector(
+        ".team-section .heads .nickname"
+      );
+
+      if (customs.gradient) {
+        lobbyNickname.style = `
+              display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")});
+              -webkit-background-clip: text !important;
+              -webkit-text-fill-color: transparent;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
+          `;
+      } else {
+        lobbyNickname.style =
+          "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+      }
+
+      if (lobbyNickname.querySelector(".juice-badges")) {
+        return;
+      }
+
+      const badgesElem = document.createElement("div");
+      badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
+      badgesElem.className = "juice-badges";
+
+      lobbyNickname.appendChild(badgesElem);
+
+      let badgeStyle = "height: 32px; width: auto;";
+
+      if (customs.discord) {
+        const linkedBadge = document.createElement("img");
+        linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+        linkedBadge.style = badgeStyle;
+        badgesElem.appendChild(linkedBadge);
+      }
+
+      if (customs.booster) {
+        const boosterBadge = document.createElement("img");
+        boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+        boosterBadge.style = badgeStyle;
+        badgesElem.appendChild(boosterBadge);
+      }
+
+      if (customs.badges && customs.badges.length) {
+        customs.badges.forEach((badge) => {
+          const img = document.createElement("img");
+          img.src = badge;
+          img.style = badgeStyle;
+          badgesElem.appendChild(img);
+        });
+      }
+    }
+
     const formatMoney = (money) => {
       if (!money.dataset.formatted) {
         const formatted = parseInt(money.innerText).toLocaleString();
@@ -462,7 +555,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const handleProfile = () => {
-    console.log("profile");
     const interval = setInterval(() => {
       if (!window.location.href.startsWith("https://kirka.io/profile")) {
         clearInterval(interval);
@@ -471,9 +563,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (document.querySelector(".profile > .content")) {
         clearInterval(interval);
 
-        const content = document.querySelector(".profile > .content");
+        const profile = document.querySelector(
+          ".content > .profile-cont > .profile"
+        );
+        const content = profile.querySelector(".profile > .content");
         const statistics = document.querySelectorAll(".statistic");
         const progressExp = document.querySelector(".progress-exp");
+
+        profile.style.minWidth = "60rem";
+        profile.style.width = "min-content";
+        profile.querySelector(".you").style.width = "100%";
+        content.style.width = "min-content";
 
         if (progressExp) {
           const [current, max] = progressExp.innerText.split("/");
@@ -518,7 +618,65 @@ document.addEventListener("DOMContentLoaded", async () => {
         kloElem.style.width = "unset";
         kloClone.style.width = "unset";
 
-        if (window.location.href.includes("H8N3U4")) {
+        const shortId = content
+          .querySelector(".card-profile .copy-cont > .value")
+          .innerText.replace("#", "");
+
+        const nickname = profile.querySelector(".nickname");
+        nickname.style.cssText +=
+          "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+        const badgesElem = document.createElement("div");
+        badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
+        badgesElem.className = "juice-badges";
+        nickname.appendChild(badgesElem);
+
+        const customizations = JSON.parse(
+          localStorage.getItem("juice-customizations")
+        );
+
+        if (customizations?.find((c) => c.shortId === shortId)) {
+          const customs = customizations.find((c) => c.shortId === shortId);
+
+          let badgeStyle = "height: 32px; width: auto;";
+
+          if (customs.gradient) {
+            nickname.style.cssText += `
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")});
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
+            `;
+          }
+
+          if (customs.discord) {
+            const linkedBadge = document.createElement("img");
+            linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+            linkedBadge.style = badgeStyle;
+            badgesElem.appendChild(linkedBadge);
+          }
+
+          if (customs.booster) {
+            const boosterBadge = document.createElement("img");
+            boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+            boosterBadge.style = badgeStyle;
+            badgesElem.appendChild(boosterBadge);
+          }
+
+          if (customs.badges && customs.badges.length) {
+            customs.badges.forEach((badge) => {
+              const img = document.createElement("img");
+              img.src = badge;
+              img.style = badgeStyle;
+              badgesElem.appendChild(img);
+            });
+          }
+        }
+
+        if (shortId && shortId === "H8N3U4") {
           const profile = document.querySelector(".profile-cont > .profile");
           profile.style.position = "relative";
 
@@ -541,20 +699,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 250);
   };
 
-  handleInGame = () => {
+  const handleInGame = () => {
     const settings = ipcRenderer.sendSync("get-settings");
+
+    const updateKD = () => {
+      const kills = document.querySelector(".kill-death .kill");
+      const deaths = document.querySelector(
+        "div > svg.icon-death"
+      ).parentElement;
+      const kd = document.querySelector(".kill-death .kd");
+
+      const killCount = parseFloat(kills.innerText);
+      const deathCount = parseFloat(deaths.innerText) || 1;
+
+      let kdRatio = (killCount / deathCount).toFixed(2);
+
+      kdRatio = parseFloat(kdRatio).toString();
+
+      kd.innerHTML = `${kdRatio} <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
+    };
 
     const createKD = () => {
       if (document.querySelector(".kill-death .kd")) return;
       const kills = document.querySelector(".kill-death .kill");
-      const kd = kills.cloneNode(true);
+      const deaths = document.querySelector(
+        "div > svg.icon-death"
+      )?.parentElement;
+      const kd = kills?.cloneNode(true);
 
+      if (!kd) return;
       kd.style.gap = "0.25rem";
       kd.classList.add("kd");
       kd.classList.remove("kill");
       kd.innerHTML = `0 <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
 
       document.querySelector(".kill-death").appendChild(kd);
+      kills.addEventListener("DOMSubtreeModified", updateKD);
+      deaths.addEventListener("DOMSubtreeModified", updateKD);
     };
 
     if (settings.kd_indicator) {
@@ -573,33 +754,102 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
+    const customizations = JSON.parse(
+      localStorage.getItem("juice-customizations")
+    );
+
     const interval = setInterval(() => {
       if (!window.location.href.startsWith("https://kirka.io/games")) {
         clearInterval(interval);
-        return;
       }
 
-      const updateKD = () => {
-        const kills = document.querySelector(".kill-death .kill");
-        const deaths = document.querySelector(
-          "div > svg.icon-death"
-        ).parentElement;
-        const kd = document.querySelector(".kill-death .kd");
+      const tabplayers = document.querySelectorAll(
+        ".desktop-game-interface .player-cont"
+      );
 
-        const killCount = parseFloat(kills.innerText);
-        const deathCount = parseFloat(deaths.innerText) || 1;
+      tabplayers.forEach((player) => {
+        const nickname = player.querySelector(".nickname");
+        const shortId = player
+          .querySelector(".short-id")
+          ?.innerText.replace("#", "");
 
-        let kdRatio = (killCount / deathCount).toFixed(2);
+        if (!shortId) {
+          player.querySelector(".juice-badges")?.remove();
+          player.querySelector(".nickname").style =
+            "display: flex; align-items: flex-end; gap: 0.25";
+          return;
+        }
 
-        kdRatio = parseFloat(kdRatio).toString();
+        const customs = customizations?.find((c) => c.shortId === shortId);
 
-        kd.innerHTML = `${kdRatio} <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
-      };
+        if (customs) {
+          let badgesElem = nickname.querySelector(".juice-badges");
 
-      if (document.querySelector(".kill-death .kd")) {
-        updateKD();
+          if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
+            if (badgesElem) {
+              badgesElem.remove();
+            }
+            badgesElem = document.createElement("div");
+            badgesElem.style =
+              "display: flex; gap: 0.25rem; align-items: center;";
+            badgesElem.className = "juice-badges";
+            badgesElem.dataset.shortId = shortId;
+            nickname.appendChild(badgesElem);
+          } else if (badgesElem.dataset.shortId === shortId) {
+            return;
+          }
+
+          const badgeStyle = "height: 22px; width: auto;";
+
+          if (customs.gradient) {
+            nickname.style = `
+              display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")}) !important;
+              -webkit-background-clip: text !important;
+              -webkit-text-fill-color: transparent !important;
+              text-shadow: ${
+                customs.gradient.shadow ||
+                "0 0 0 transparent"
+              } !important;
+              font-weight: 500 !important;
+            `;
+          }
+
+          if (customs.discord) {
+            const linkedBadge = document.createElement("img");
+            linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+            linkedBadge.style.cssText = badgeStyle;
+            badgesElem.appendChild(linkedBadge);
+          }
+
+          if (customs.booster) {
+            const boosterBadge = document.createElement("img");
+            boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+            boosterBadge.style.cssText = badgeStyle;
+            badgesElem.appendChild(boosterBadge);
+          }
+
+          if (customs.badges && customs.badges.length) {
+            customs.badges.forEach((badge) => {
+              const img = document.createElement("img");
+              img.src = badge;
+              img.style.cssText = badgeStyle;
+              badgesElem.appendChild(img);
+            });
+          }
+        } else {
+          nickname.querySelector(".juice-badges")?.remove();
+          nickname.style =
+            "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+        }
+      });
+
+      if (!document.querySelector(".kill-death .kd") && settings.kd_indicator) {
+        createKD();
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleMarket = () => {
@@ -619,6 +869,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
     }, 250);
+  };
+
+  const handleFriends = () => {
+    document.addEventListener("click", (e) => {
+      if (e.shiftKey && e.target.classList.contains("online")) {
+        const online = e.target;
+        if (online && online.innerText.includes("in game")) {
+          const content = online.innerText.match(/\[(.*?)\]/)[1];
+          const gameLink = `https://kirka.io/games/${content}`;
+          navigator.clipboard.writeText(gameLink);
+          customNotification({
+            message: `Copied game link to clipboard: ${gameLink}`,
+          });
+        }
+      }
+    });
   };
 
   const customNotification = (data) => {
@@ -690,6 +956,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (url === "https://kirka.io/hub/market") {
       handleMarket();
     }
+    if (url === "https://kirka.io/friends") {
+      handleFriends();
+    }
   });
 
   const handleInitialLoad = () => {
@@ -708,6 +977,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (url === "https://kirka.io/hub/market") {
       handleMarket();
+    }
+    if (url === "https://kirka.io/friends") {
+      handleFriends();
     }
 
     loadTheme();
