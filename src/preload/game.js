@@ -372,21 +372,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     lobbyNews();
     juiceDiscordButton();
 
+    const settings = ipcRenderer.sendSync("get-settings");
+
     const customizations = JSON.parse(
       localStorage.getItem("juice-customizations")
     );
     const currentUser = JSON.parse(localStorage.getItem("current-user"));
 
-    if (customizations?.find((c) => c.shortId === currentUser?.shortId)) {
-      const customs = customizations.find(
-        (c) => c.shortId === currentUser.shortId
-      );
-      const lobbyNickname = document.querySelector(
-        ".team-section .heads .nickname"
-      );
+    const applyCustomizations = () => {
+      if (customizations?.find((c) => c.shortId === currentUser?.shortId)) {
+        const customs = customizations.find(
+          (c) => c.shortId === currentUser.shortId
+        );
+        const lobbyNickname = document.querySelector(
+          ".team-section .heads .nickname"
+        );
 
-      if (customs.gradient) {
-        lobbyNickname.style = `
+        if (customs.gradient) {
+          lobbyNickname.style = `
               display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
               background: linear-gradient(${
                 customs.gradient.rot
@@ -397,46 +400,70 @@ document.addEventListener("DOMContentLoaded", async () => {
                 customs.gradient.shadow || "0 0 0 transparent"
               } !important;
           `;
-      } else {
-        lobbyNickname.style =
-          "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+        } else {
+          lobbyNickname.style =
+            "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+        }
+
+        if (lobbyNickname.querySelector(".juice-badges")) {
+          return;
+        }
+
+        const badgesElem = document.createElement("div");
+        badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
+        badgesElem.className = "juice-badges";
+
+        lobbyNickname.appendChild(badgesElem);
+
+        let badgeStyle = "height: 32px; width: auto;";
+
+        if (customs.discord) {
+          const linkedBadge = document.createElement("img");
+          linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+          linkedBadge.style = badgeStyle;
+          badgesElem.appendChild(linkedBadge);
+        }
+
+        if (customs.booster) {
+          const boosterBadge = document.createElement("img");
+          boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+          boosterBadge.style = badgeStyle;
+          badgesElem.appendChild(boosterBadge);
+        }
+
+        if (customs.badges && customs.badges.length) {
+          customs.badges.forEach((badge) => {
+            const img = document.createElement("img");
+            img.src = badge;
+            img.style = badgeStyle;
+            badgesElem.appendChild(img);
+          });
+        }
       }
+    };
 
-      if (lobbyNickname.querySelector(".juice-badges")) {
-        return;
-      }
+    const removeCustomizations = () => {
+      const lobbyNickname = document.querySelector(
+        ".team-section .heads .nickname"
+      );
+      lobbyNickname.style =
+        "display: flex; align-items: flex-end; gap: 0.25rem;";
+      lobbyNickname.querySelector(".juice-badges")?.remove();
+    };
 
-      const badgesElem = document.createElement("div");
-      badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
-      badgesElem.className = "juice-badges";
-
-      lobbyNickname.appendChild(badgesElem);
-
-      let badgeStyle = "height: 32px; width: auto;";
-
-      if (customs.discord) {
-        const linkedBadge = document.createElement("img");
-        linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
-        linkedBadge.style = badgeStyle;
-        badgesElem.appendChild(linkedBadge);
-      }
-
-      if (customs.booster) {
-        const boosterBadge = document.createElement("img");
-        boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
-        boosterBadge.style = badgeStyle;
-        badgesElem.appendChild(boosterBadge);
-      }
-
-      if (customs.badges && customs.badges.length) {
-        customs.badges.forEach((badge) => {
-          const img = document.createElement("img");
-          img.src = badge;
-          img.style = badgeStyle;
-          badgesElem.appendChild(img);
-        });
-      }
+    if (settings.customizations) {
+      applyCustomizations();
     }
+
+    document.addEventListener("juice-settings-changed", (e) => {
+      if (e.detail.setting === "customizations") {
+        if (e.detail.value) {
+          applyCustomizations();
+        } else {
+          removeCustomizations();
+        }
+      }
+    });
 
     const formatMoney = (money) => {
       if (!money.dataset.formatted) {
@@ -555,6 +582,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const handleProfile = () => {
+    const settings = ipcRenderer.sendSync("get-settings");
+
     const interval = setInterval(() => {
       if (!window.location.href.startsWith("https://kirka.io/profile")) {
         clearInterval(interval);
@@ -569,13 +598,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const content = profile.querySelector(".profile > .content");
         const statistics = document.querySelectorAll(".statistic");
         const progressExp = document.querySelector(".progress-exp");
-
-        profile.style.minWidth = "60rem";
-        profile.style.width = "min-content";
-        profile.querySelector(".you").style.width = "100%";
-        profile.querySelector(".you").style.minWidth = "max-content";
-        content.style.minWidth = "60%";
-        content.style.width = "min-content";
 
         if (progressExp) {
           const [current, max] = progressExp.innerText.split("/");
@@ -617,32 +639,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         contentTop.insertBefore(kloClone, contentTop.children[1]);
 
-        kloElem.style.width = "unset";
-        kloClone.style.width = "unset";
+        content
+          .querySelectorAll(".top-medium > .top > .card")
+          .forEach((card) => {
+            if (card.classList.contains("progress")) return;
+            card.style.width = "unset";
+          });
 
         const shortId = content
           .querySelector(".card-profile .copy-cont > .value")
           .innerText.replace("#", "");
 
-        const nickname = profile.querySelector(".nickname");
-        nickname.style.cssText +=
-          "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
-        const badgesElem = document.createElement("div");
-        badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
-        badgesElem.className = "juice-badges";
-        nickname.appendChild(badgesElem);
+        if (settings.customizations) {
+          const nickname = profile.querySelector(".nickname");
+          nickname.style.cssText +=
+            "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+          const badgesElem = document.createElement("div");
+          badgesElem.style =
+            "display: flex; gap: 0.25rem; align-items: center;";
+          badgesElem.className = "juice-badges";
+          nickname.appendChild(badgesElem);
 
-        const customizations = JSON.parse(
-          localStorage.getItem("juice-customizations")
-        );
+          const customizations = JSON.parse(
+            localStorage.getItem("juice-customizations")
+          );
 
-        if (customizations?.find((c) => c.shortId === shortId)) {
-          const customs = customizations.find((c) => c.shortId === shortId);
+          if (customizations?.find((c) => c.shortId === shortId)) {
+            const customs = customizations.find((c) => c.shortId === shortId);
 
-          let badgeStyle = "height: 32px; width: auto;";
+            let badgeStyle = "height: 32px; width: auto;";
 
-          if (customs.gradient) {
-            nickname.style.cssText += `
+            if (customs.gradient) {
+              nickname.style.cssText += `
               background: linear-gradient(${
                 customs.gradient.rot
               }, ${customs.gradient.stops.join(", ")});
@@ -652,29 +680,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 customs.gradient.shadow || "0 0 0 transparent"
               } !important;
             `;
-          }
+            }
 
-          if (customs.discord) {
-            const linkedBadge = document.createElement("img");
-            linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
-            linkedBadge.style = badgeStyle;
-            badgesElem.appendChild(linkedBadge);
-          }
+            if (customs.discord) {
+              const linkedBadge = document.createElement("img");
+              linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+              linkedBadge.style = badgeStyle;
+              badgesElem.appendChild(linkedBadge);
+            }
 
-          if (customs.booster) {
-            const boosterBadge = document.createElement("img");
-            boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
-            boosterBadge.style = badgeStyle;
-            badgesElem.appendChild(boosterBadge);
-          }
+            if (customs.booster) {
+              const boosterBadge = document.createElement("img");
+              boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+              boosterBadge.style = badgeStyle;
+              badgesElem.appendChild(boosterBadge);
+            }
 
-          if (customs.badges && customs.badges.length) {
-            customs.badges.forEach((badge) => {
-              const img = document.createElement("img");
-              img.src = badge;
-              img.style = badgeStyle;
-              badgesElem.appendChild(img);
-            });
+            if (customs.badges && customs.badges.length) {
+              customs.badges.forEach((badge) => {
+                const img = document.createElement("img");
+                img.src = badge;
+                img.style = badgeStyle;
+                badgesElem.appendChild(img);
+              });
+            }
           }
         }
 
@@ -702,7 +731,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const handleInGame = () => {
-    const settings = ipcRenderer.sendSync("get-settings");
+    let settings = ipcRenderer.sendSync("get-settings");
 
     const updateKD = () => {
       const kills = document.querySelector(".kill-death .kill");
@@ -740,19 +769,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       deaths.addEventListener("DOMSubtreeModified", updateKD);
     };
 
-    if (settings.kd_indicator) {
-      createKD();
-    }
-
     document.addEventListener("juice-settings-changed", (e) => {
       if (e.detail.setting === "kd_indicator") {
-        if (e.detail.value === true) {
-          createKD();
-        } else {
-          if (document.querySelector(".kill-death .kd")) {
-            document.querySelector(".kill-death .kd").remove();
-          }
-        }
+        settings.kd_indicator = e.detail.value;
+      } else if (e.detail.setting === "customizations") {
+        settings.customizations = e.detail.value;
       }
     });
 
@@ -769,47 +790,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         ".desktop-game-interface .player-cont"
       );
 
-      tabplayers.forEach((player) => {
-        const nickname = player.querySelector(".nickname");
-        const shortId = player
-          .querySelector(".short-id")
-          ?.innerText.replace("#", "");
+      if (settings.customizations) {
+        tabplayers.forEach((player) => {
+          const nickname = player.querySelector(".nickname");
+          const shortId = player
+            .querySelector(".short-id")
+            ?.innerText.replace("#", "");
 
-        if (!shortId) {
-          player.querySelector(".juice-badges")?.remove();
-          player.querySelector(".nickname").style =
-            "display: flex; align-items: flex-end; gap: 0.25";
-          return;
-        }
-
-        const customs = customizations?.find((c) => c.shortId === shortId);
-
-        if (customs) {
-          let badgesElem = nickname.querySelector(".juice-badges");
-
-          if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
-            if (badgesElem) {
-              badgesElem.remove();
-            }
-            badgesElem = document.createElement("div");
-            badgesElem.style =
-              "display: flex; gap: 0.25rem; align-items: center;";
-            badgesElem.className = "juice-badges";
-            badgesElem.dataset.shortId = shortId;
-            nickname.appendChild(badgesElem);
-          } else if (badgesElem.dataset.shortId === shortId) {
+          if (!shortId) {
+            player.querySelector(".juice-badges")?.remove();
+            player.querySelector(".nickname").style =
+              "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
             return;
           }
 
-          const badgeStyle = "height: 22px; width: auto;";
+          const customs = customizations?.find((c) => c.shortId === shortId);
 
-          if (customs.gradient) {
-            nickname.style = `
+          if (customs) {
+            let badgesElem = nickname.querySelector(".juice-badges");
+
+            if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
+              if (badgesElem) {
+                badgesElem.remove();
+              }
+              badgesElem = document.createElement("div");
+              badgesElem.style =
+                "display: flex; gap: 0.25rem; align-items: center;";
+              badgesElem.className = "juice-badges";
+              badgesElem.dataset.shortId = shortId;
+              nickname.appendChild(badgesElem);
+            } else if (badgesElem.dataset.shortId === shortId) {
+              return;
+            }
+
+            const badgeStyle = "height: 22px; width: auto;";
+
+            if (customs.gradient) {
+              nickname.style = `
               display: flex !important;
               align-items: flex-end !important;
               gap: 0.25rem !important;
-              max-width: min-width !important;
-              flex-direction: row !important;
+              max-width: unset !important;
               background: linear-gradient(${
                 customs.gradient.rot
               }, ${customs.gradient.stops.join(", ")}) !important;
@@ -820,39 +841,54 @@ document.addEventListener("DOMContentLoaded", async () => {
               } !important;
               font-weight: 700 !important;
             `;
-          }
+            } else {
+              nickname.style =
+                "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+            }
 
-          if (customs.discord) {
-            const linkedBadge = document.createElement("img");
-            linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
-            linkedBadge.style.cssText = badgeStyle;
-            badgesElem.appendChild(linkedBadge);
-          }
+            if (customs.discord) {
+              const linkedBadge = document.createElement("img");
+              linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+              linkedBadge.style.cssText = badgeStyle;
+              badgesElem.appendChild(linkedBadge);
+            }
 
-          if (customs.booster) {
-            const boosterBadge = document.createElement("img");
-            boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
-            boosterBadge.style.cssText = badgeStyle;
-            badgesElem.appendChild(boosterBadge);
-          }
+            if (customs.booster) {
+              const boosterBadge = document.createElement("img");
+              boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+              boosterBadge.style.cssText = badgeStyle;
+              badgesElem.appendChild(boosterBadge);
+            }
 
-          if (customs.badges && customs.badges.length) {
-            customs.badges.forEach((badge) => {
-              const img = document.createElement("img");
-              img.src = badge;
-              img.style.cssText = badgeStyle;
-              badgesElem.appendChild(img);
-            });
+            if (customs.badges && customs.badges.length) {
+              customs.badges.forEach((badge) => {
+                const img = document.createElement("img");
+                img.src = badge;
+                img.style.cssText = badgeStyle;
+                badgesElem.appendChild(img);
+              });
+            }
+          } else {
+            nickname.querySelector(".juice-badges")?.remove();
+            nickname.style =
+              "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
           }
-        } else {
-          nickname.querySelector(".juice-badges")?.remove();
-          nickname.style =
-            "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
-        }
-      });
+        });
+      } else {
+        tabplayers.forEach((player) => {
+          player.querySelector(".juice-badges")?.remove();
+          player.querySelector(".nickname").style =
+            "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+        });
+      }
 
       if (!document.querySelector(".kill-death .kd") && settings.kd_indicator) {
         createKD();
+      } else if (
+        document.querySelector(".kill-death .kd") &&
+        !settings.kd_indicator
+      ) {
+        document.querySelector(".kill-death .kd").remove();
       }
     }, 1000);
   };
@@ -877,6 +913,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const handleFriends = () => {
+    const settings = ipcRenderer.sendSync("get-settings");
+
     document.addEventListener("click", (e) => {
       if (e.shiftKey && e.target.classList.contains("online")) {
         const online = e.target;
@@ -900,22 +938,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         localStorage.getItem("juice-customizations")
       );
 
-      const friends = document.querySelectorAll(".friend");
-      friends.forEach((friend) => {
-        const shortId = friend.querySelector(".friend-id").innerText;
-        const customs = customizations?.find((c) => c.shortId === shortId);
+      if (settings.customizations) {
+        const friends = document.querySelectorAll(".friend");
+        friends.forEach((friend) => {
+          const shortId = friend.querySelector(".friend-id").innerText;
+          const customs = customizations?.find((c) => c.shortId === shortId);
 
-        if (customs) {
-          const nickname = friend.querySelector(".nickname");
-          nickname.style = `
+          if (customs) {
+            const nickname = friend.querySelector(".nickname");
+            nickname.style = `
             display: flex !important;
             align-items: flex-end !important;
             gap: 0.25rem !important;
             overflow: unset !important;
           `;
 
-          if (customs.gradient) {
-            nickname.style = `
+            if (customs.gradient) {
+              nickname.style = `
               display: flex !important;
               align-items: flex-end !important;
               gap: 0.25rem !important;
@@ -931,50 +970,51 @@ document.addEventListener("DOMContentLoaded", async () => {
               } !important;
               font-weight: 700 !important;
             `;
-          }
-
-          let badgesElem = nickname.querySelector(".juice-badges");
-
-          if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
-            if (badgesElem) {
-              badgesElem.remove();
             }
-            badgesElem = document.createElement("div");
-            badgesElem.style =
-              "display: flex; gap: 0.25rem; align-items: center;";
-            badgesElem.className = "juice-badges";
-            badgesElem.dataset.shortId = shortId;
-            nickname.appendChild(badgesElem);
-          } else if (badgesElem.dataset.shortId === shortId) {
-            return;
-          }
 
-          const badgeStyle = "height: 18px; width: auto;";
+            let badgesElem = nickname.querySelector(".juice-badges");
 
-          if (customs.discord) {
-            const linkedBadge = document.createElement("img");
-            linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
-            linkedBadge.style.cssText = badgeStyle;
-            badgesElem.appendChild(linkedBadge);
-          }
+            if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
+              if (badgesElem) {
+                badgesElem.remove();
+              }
+              badgesElem = document.createElement("div");
+              badgesElem.style =
+                "display: flex; gap: 0.25rem; align-items: center;";
+              badgesElem.className = "juice-badges";
+              badgesElem.dataset.shortId = shortId;
+              nickname.appendChild(badgesElem);
+            } else if (badgesElem.dataset.shortId === shortId) {
+              return;
+            }
 
-          if (customs.booster) {
-            const boosterBadge = document.createElement("img");
-            boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
-            boosterBadge.style.cssText = badgeStyle;
-            badgesElem.appendChild(boosterBadge);
-          }
+            const badgeStyle = "height: 18px; width: auto;";
 
-          if (customs.badges && customs.badges.length) {
-            customs.badges.forEach((badge) => {
-              const img = document.createElement("img");
-              img.src = badge;
-              img.style.cssText = badgeStyle;
-              badgesElem.appendChild(img);
-            });
+            if (customs.discord) {
+              const linkedBadge = document.createElement("img");
+              linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
+              linkedBadge.style.cssText = badgeStyle;
+              badgesElem.appendChild(linkedBadge);
+            }
+
+            if (customs.booster) {
+              const boosterBadge = document.createElement("img");
+              boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
+              boosterBadge.style.cssText = badgeStyle;
+              badgesElem.appendChild(boosterBadge);
+            }
+
+            if (customs.badges && customs.badges.length) {
+              customs.badges.forEach((badge) => {
+                const img = document.createElement("img");
+                img.src = badge;
+                img.style.cssText = badgeStyle;
+                badgesElem.appendChild(img);
+              });
+            }
           }
-        }
-      });
+        });
+      }
     }, 250);
   };
 

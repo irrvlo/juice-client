@@ -1,32 +1,51 @@
-const version = require("../../package.json").version;
-const clientid = "1233829658345078846";
 const rpc = require("discord-rpc");
+const version = require("../../package.json").version;
 
-const initRPC = () => {
-  const client = new rpc.Client({ transport: "ipc" });
+class DiscordRPC {
+  constructor() {
+    this.clientId = "1233829658345078846";
+    this.client = new rpc.Client({ transport: "ipc" });
+    this.init();
+  }
 
-  client.on("ready", () => {
-    client.request("SET_ACTIVITY", {
-      pid: process.pid,
-      activity: {
-        timestamps: { start: Date.now() },
-        assets: {
-          large_image: "juice",
-          large_text: `Juice Client v${version}`,
-        },
-        buttons: [
-          { label: "Download", url: "https://juice.irrvlo.xyz" },
-          { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },
-        ],
-      },
+  init() {
+    this.client.on("ready", () => {
+      this.setActivity();
     });
-  });
 
-  client.on("disconnected", () => {
-    client.login({ clientId: clientid }).catch(console.error);
-  });
+    this.client.on("disconnected", () => {
+      this.client.login({ clientId: this.clientId }).catch(console.error);
+    });
 
-  client.login({ clientId: clientid }).catch(console.error);
-};
+    this.client.login({ clientId: this.clientId }).catch(console.error);
+  }
 
-module.exports = { initRPC };
+  setActivity(activity = this.defaultActivity()) {
+    this.client.request("SET_ACTIVITY", {
+      pid: process.pid,
+      activity: activity,
+    });
+  }
+
+  defaultActivity() {
+    return {
+      timestamps: { start: Date.now() },
+      state: "In the lobby",
+      assets: {
+        large_image: "juice",
+        large_text: `Juice Client v${version}`,
+      },
+      buttons: [
+        { label: "Download", url: "https://juice.irrvlo.xyz" },
+        { label: "Discord", url: "https://discord.gg/FjzAAdSjng" },
+      ],
+    };
+  }
+
+  updateActivity(newActivity) {
+    this.setActivity(newActivity);
+  }
+}
+
+module.exports = DiscordRPC;
+

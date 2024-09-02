@@ -2,12 +2,12 @@ const { BrowserWindow, ipcMain, app } = require("electron");
 const { default_settings } = require("../util/defaults.json");
 const { registerShortcuts } = require("../util/shortcuts");
 const { applySwitches } = require("../util/switches");
-const { initRPC } = require("../addons/rpc");
+const DiscordRPC = require("../addons/rpc");
 const path = require("path");
 const Store = require("electron-store");
-const store = new Store();
 const fs = require("fs");
 
+const store = new Store();
 if (!store.has("settings")) {
   store.set("settings", default_settings);
 }
@@ -55,6 +55,8 @@ const createWindow = () => {
     },
   });
 
+  gameWindow.startTimestamp = Date.now();
+
   const scriptsPath = path.join(
     app.getPath("documents"),
     "JuiceClient",
@@ -68,13 +70,51 @@ const createWindow = () => {
     e.returnValue = scriptsPath;
   });
 
-  gameWindow.webContents.on("new-window", function (e, url) {
+  gameWindow.webContents.on("new-window", (e, url) => {
     e.preventDefault();
     require("electron").shell.openExternal(url);
   });
 
   gameWindow.webContents.on("did-navigate-in-page", (e, url) => {
     gameWindow.webContents.send("url-change", url);
+
+    if (settings.discord_rpc && gameWindow.DiscordRPC) {
+      const stateMap = {
+        "https://kirka.io": "In the lobby",
+        "https://kirka.io/hub/leaderboard": "Viewing the leaderboard",
+        "https://kirka.io/hub/clans/champions-league":
+          "Viewing the clan leaderboard",
+        "https://kirka.io/hub/clans/my-clan": "Viewing their clan",
+        "https://kirka.io/hub/market": "Viewing the market",
+        "https://kirka.io/hub/live": "Viewing videos",
+        "https://kirka.io/hub/news": "Viewing news",
+        "https://kirka.io/hub/terms": "Viewing the terms of service",
+        "https://kirka.io/store": "Viewing the store",
+        "https://kirka.io/servers/main": "Viewing main servers",
+        "https://kirka.io/servers/parkour": "Viewing parkour servers",
+        "https://kirka.io/servers/custom": "Viewing custom servers",
+        "https://kirka.io/quests/hourly": "Viewing hourly quests",
+        "https://kirka.io/friends": "Viewing friends",
+        "https://kirka.io/inventory": "Viewing their inventory",
+      };
+
+      let state;
+
+      if (stateMap[url]) {
+        state = stateMap[url];
+      } else if (url.startsWith("https://kirka.io/games/")) {
+        state = "In a match";
+      } else if (url.startsWith("https://kirka.io/profile/")) {
+        state = "Viewing a profile";
+      } else {
+        state = "In the lobby";
+      }
+
+      gameWindow.DiscordRPC.updateActivity({
+        state,
+        timestamps: { start: gameWindow.startTimestamp },
+      });
+    }
   });
 
   gameWindow.loadURL("https://kirka.io");
@@ -99,7 +139,7 @@ const createWindow = () => {
 const initGame = () => {
   createWindow();
   if (settings.discord_rpc) {
-    initRPC();
+    gameWindow.DiscordRPC = new DiscordRPC();
   }
 };
 
