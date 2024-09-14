@@ -20,6 +20,10 @@
     "advanced_css": "",
     "in_process_gpu": false,
     "menu_keybind": "ShiftRight",
-    "menu_theme": "dark"
+    "menu_theme": "dark",
+    "general_news": true,
+    "promotional_news": true,
+    "event_news": true,
+    "alert_news": true
   }
 }

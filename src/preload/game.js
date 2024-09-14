@@ -60,18 +60,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     return link.replace(/\\/g, "/");
   };
 
-  const lobbyNews = async () => {
+  const lobbyNews = async (settings) => {
     if (
       !document.querySelector("#app > .interface") ||
       document.querySelector(".lobby-news")
     )
       return;
 
-    const news = await fetch("https://juice-api.irrvlo.xyz/api/news").then(
+    const { general_news, promotional_news, event_news, alert_news } = settings;
+
+    if (!general_news && !promotional_news && !event_news && !alert_news) return;
+    
+    let news = await fetch("https://juice-api.irrvlo.xyz/api/news").then(
       (res) => res.json()
     );
 
     if (!news.length) return;
+
+    news = news.filter((newsItem) => {
+      if (newsItem.category === "general" && !general_news) return false;
+      if (newsItem.category === "promotional" && !promotional_news) return false;
+      if (newsItem.category === "event" && !event_news) return false;
+      if (newsItem.category === "alert" && !alert_news) return false;
+      return true;
+    });
+
+    const scaleFactor = Math.min(
+      1,
+      window.innerWidth / 1600,
+      window.innerHeight / 900
+    );
 
     const lobbyNewsContainer = document.createElement("div");
     lobbyNewsContainer.id = "lobby-news";
@@ -83,8 +101,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       flex-direction: column;
       gap: 0.25rem;
       transform-origin: top left;
-      top: 180px;
-      left: 147px;
+      top: ${180 * scaleFactor}px;
+      left: ${147 * scaleFactor}px;
+      transform: scale(${scaleFactor});
     `;
 
     document.querySelector("#app > .interface").appendChild(lobbyNewsContainer);
@@ -119,22 +138,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.appendChild(img);
       };
 
-      const addNew = () => {
-        const newSpan = document.createElement("span");
-        newSpan.className = "new";
-        newSpan.innerText = "NEW";
-        newSpan.style = `
+      const addBadge = (text, color) => {
+        const badgeSpan = document.createElement("span");
+        badgeSpan.className = "badge";
+        badgeSpan.innerText = text;
+        badgeSpan.style = `
           position: absolute;
           top: 0;
           right: 0;
-          background-color: #e24f4f;
+          background-color: ${color};
           color: #fff;
-          padding: 0.1rem 0.25rem;
+          padding: 0.15rem 0.25rem;
           font-size: 0.75rem;
           font-weight: 600;
           border-radius: 0 0 0 0.25rem;
         `;
-        div.appendChild(newSpan);
+        div.appendChild(badgeSpan);
       };
 
       const addContent = () => {
@@ -175,8 +194,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (newsItem.img && newsItem.img !== "") addImage();
 
-      if (newsItem.updatedAt && newsItem.updatedAt > Date.now() - 432000000) {
-        addNew();
+      if (
+        newsItem.updatedAt &&
+        newsItem.updatedAt > Date.now() - 432000000 &&
+        !newsItem.live
+      ) {
+        addBadge("NEW", "#e24f4f");
+      } else if (newsItem.live) {
+        addBadge("LIVE", "#4dbf4d");
       }
       addContent();
 
@@ -369,10 +394,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const handleLobby = () => {
-    lobbyNews();
-    juiceDiscordButton();
-
     const settings = ipcRenderer.sendSync("get-settings");
+
+    lobbyNews(settings);
+    juiceDiscordButton();
 
     const customizations = JSON.parse(
       localStorage.getItem("juice-customizations")

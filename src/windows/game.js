@@ -55,8 +55,6 @@ const createWindow = () => {
     },
   });
 
-  gameWindow.startTimestamp = Date.now();
-
   const scriptsPath = path.join(
     app.getPath("documents"),
     "JuiceClient",
@@ -110,10 +108,7 @@ const createWindow = () => {
         state = "In the lobby";
       }
 
-      gameWindow.DiscordRPC.updateActivity({
-        state,
-        timestamps: { start: gameWindow.startTimestamp },
-      });
+      gameWindow.DiscordRPC.setState(state);
     }
   });
 
