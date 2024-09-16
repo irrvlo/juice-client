@@ -7,8 +7,7 @@ A light Electron client for Kirka.io. Join our [discord](https://discord.gg/FjzA
 - [Website](https://juice.irrvlo.xyz)
 - [Releases](https://github.com/irrvlo/juice-client/releases)
 
-Windows and MacOS releases are available. Linux will come if requested enough.
-
+Windows, Linux and MacOS releases are available.
 # What features does this have?
 
 - Uncapped FPS
@@ -45,6 +44,9 @@ Windows and MacOS releases are available. Linux will come if requested enough.
 | F7 | Copy URL |
 | F11 | Fullscreen |
 | F12 & Ctrl + Shift + I | Open DevTools |
+
+## Known bugs:
+- Pulp manifests under rare conditions, fix coming in v2.0
 
 # Is it safe?
 
