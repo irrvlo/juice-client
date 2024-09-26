@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const fetchCustomizations = async () => {
     const customizations = await fetch(
-      "https://juice-api.irrvlo.xyz/api/customizations" <- 
+      "https://juice-api.irrvlo.xyz/api/customizations"  
     ).then((res) => res.json());
 
     localStorage.setItem(
