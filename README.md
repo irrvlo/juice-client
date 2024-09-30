@@ -46,7 +46,7 @@ Windows, Linux and MacOS releases are available.
 | F12 & Ctrl + Shift + I | Open DevTools |
 
 ## Known bugs:
-- Pulp manifests under rare conditions, fix coming in v2.0
+- Pulp manifests under rare conditions. 
 
 # Is it safe?
 
