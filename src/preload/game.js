@@ -29,32 +29,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   opener();
 
-  const fetchCustomizations = async () => {
-    const customizations = await fetch(
-      "https://juice-api.irrvlo.xyz/api/customizations"
-    ).then((res) => res.json());
-
-    localStorage.setItem(
-      "juice-customizations",
-      JSON.stringify(customizations)
-    );
-  };
-  fetchCustomizations();
-
-  const fetchCurrentUser = async () => {
-    const user = await fetch("https://api.kirka.io/api/user", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => res.json());
-
+  const fetchAll = async () => {
+    const [customizations, user] = await Promise.all([
+      fetch("https://juice-api.irrvlo.xyz/api/customizations").then((res) => res.json()),
+      fetch("https://api.kirka.io/api/user", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }).then((res) => res.json())
+    ]);
+  
+    localStorage.setItem("juice-customizations", JSON.stringify(customizations));
     if (user.statusCode === 401) {
       localStorage.setItem("current-user", JSON.stringify({}));
     } else {
       localStorage.setItem("current-user", JSON.stringify(user));
     }
   };
-  fetchCurrentUser();
+  fetchAll();
 
   const formatLink = (link) => {
     return link.replace(/\\/g, "/");
