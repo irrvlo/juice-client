@@ -17,7 +17,12 @@ scripts.forEach((script) => {
 if (!window.location.href.startsWith("https://kirka.io")) {
   Object.defineProperty(navigator, "userAgent", {
     get: () =>
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36", // Windows 10 using diff chrome vers
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246", // Windows 10-based PC using Edge browser
+        "Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36", // Chromebook using chrome
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9" // Mac on safari
+      ][Math.floor(Math.random() * 4)],
   });
   window.require = undefined;
   document.querySelector("#juice-menu").remove();
