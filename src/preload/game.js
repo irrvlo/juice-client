@@ -15,12 +15,9 @@ scripts.forEach((script) => {
 });
 
 if (!window.location.href.startsWith("https://kirka.io")) {
-  Object.defineProperty(navigator, "userAgent", {
-    get: () =>
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-  });
-  window.require = undefined;
-  document.querySelector("#juice-menu").remove();
+  delete window.process;
+  delete window.require;
+  return;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -31,15 +28,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const fetchAll = async () => {
     const [customizations, user] = await Promise.all([
-      fetch("https://juice-api.irrvlo.xyz/api/customizations").then((res) => res.json()),
+      fetch("https://juice-api.irrvlo.xyz/api/customizations").then((res) =>
+        res.json()
+      ),
       fetch("https://api.kirka.io/api/user", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      }).then((res) => res.json())
+      }).then((res) => res.json()),
     ]);
-  
-    localStorage.setItem("juice-customizations", JSON.stringify(customizations));
+
+    localStorage.setItem(
+      "juice-customizations",
+      JSON.stringify(customizations)
+    );
     if (user.statusCode === 401) {
       localStorage.setItem("current-user", JSON.stringify({}));
     } else {
@@ -61,8 +63,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { general_news, promotional_news, event_news, alert_news } = settings;
 
-    if (!general_news && !promotional_news && !event_news && !alert_news) return;
-    
+    if (!general_news && !promotional_news && !event_news && !alert_news)
+      return;
+
     let news = await fetch("https://juice-api.irrvlo.xyz/api/news").then(
       (res) => res.json()
     );
@@ -71,7 +74,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     news = news.filter((newsItem) => {
       if (newsItem.category === "general" && !general_news) return false;
-      if (newsItem.category === "promotional" && !promotional_news) return false;
+      if (newsItem.category === "promotional" && !promotional_news)
+        return false;
       if (newsItem.category === "event" && !event_news) return false;
       if (newsItem.category === "alert" && !alert_news) return false;
       return true;
@@ -427,7 +431,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const badgesElem = document.createElement("div");
-        badgesElem.style = "display: flex; gap: 0.25rem; align-items: center;";
+        badgesElem.style =
+          "display: flex; gap: 0.25rem; align-items: center; width: 0;";
         badgesElem.className = "juice-badges";
 
         lobbyNickname.appendChild(badgesElem);
@@ -616,6 +621,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const statistics = document.querySelectorAll(".statistic");
         const progressExp = document.querySelector(".progress-exp");
 
+        profile.style = "width: unset; min-width: 60rem;";
+        profile.querySelector(".you").style = "width: 100%;";
+        content.style = "width: 36.5rem; flex-shrink: 0;";
+
         if (progressExp) {
           const [current, max] = progressExp.innerText.split("/");
           progressExp.innerText = `${parseInt(
@@ -638,6 +647,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             deaths = value;
           }
 
+          if (stat.innerText.includes(".")) return;
+
           stat.querySelector(".stat-value").innerText = value.replace(
             value.split(" ")[0],
             parseInt(value.split(" ")[0]).toLocaleString()
@@ -645,6 +656,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         const kloElem = content.querySelector(".card.k-d");
+        const kloStat = kloElem.querySelector(".stat-value");
+        kloStat.innerText = kloStat.innerText.replace(
+          kloStat.innerText,
+          parseInt(kloStat.innerText).toLocaleString()
+        );
 
         const kloClone = kloElem.cloneNode(true);
         kloClone.querySelector(".v-popover").remove();
@@ -671,6 +687,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           const nickname = profile.querySelector(".nickname");
           nickname.style.cssText +=
             "display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;";
+
+          const textNode = nickname.firstChild;
+          if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+            const span = document.createElement("span");
+            span.className = "nickname-span";
+            span.textContent = textNode.textContent;
+            nickname.replaceChild(span, textNode);
+          }
+
           const badgesElem = document.createElement("div");
           badgesElem.style =
             "display: flex; gap: 0.25rem; align-items: center;";
@@ -687,7 +712,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             let badgeStyle = "height: 32px; width: auto;";
 
             if (customs.gradient) {
-              nickname.style.cssText += `
+              nickname.querySelector(".nickname-span").style.cssText += `
               background: linear-gradient(${
                 customs.gradient.rot
               }, ${customs.gradient.stops.join(", ")});
@@ -809,6 +834,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (settings.customizations) {
         tabplayers.forEach((player) => {
+          const playerLeft = player.querySelector(".player-left");
           const nickname = player.querySelector(".nickname");
           const shortId = player
             .querySelector(".short-id")
@@ -816,15 +842,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           if (!shortId) {
             player.querySelector(".juice-badges")?.remove();
-            player.querySelector(".nickname").style =
-              "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+            nickname.style = "";
+            playerLeft.style = "";
             return;
           }
 
           const customs = customizations?.find((c) => c.shortId === shortId);
 
           if (customs) {
-            let badgesElem = nickname.querySelector(".juice-badges");
+            let badgesElem = player.querySelector(".juice-badges");
 
             if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
               if (badgesElem) {
@@ -832,10 +858,13 @@ document.addEventListener("DOMContentLoaded", async () => {
               }
               badgesElem = document.createElement("div");
               badgesElem.style =
-                "display: flex; gap: 0.25rem; align-items: center;";
+                "display: flex; gap: 0.25rem; align-items: center; margin-left: 0.25rem;";
               badgesElem.className = "juice-badges";
               badgesElem.dataset.shortId = shortId;
-              nickname.appendChild(badgesElem);
+
+              nickname.style = "overflow: unset;";
+              playerLeft.style = "width: 0;";
+              playerLeft.insertBefore(badgesElem, playerLeft.lastChild);
             } else if (badgesElem.dataset.shortId === shortId) {
               return;
             }
@@ -844,10 +873,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (customs.gradient) {
               nickname.style = `
-              display: flex !important;
-              align-items: flex-end !important;
-              gap: 0.25rem !important;
-              max-width: unset !important;
+              overflow: unset;
               background: linear-gradient(${
                 customs.gradient.rot
               }, ${customs.gradient.stops.join(", ")}) !important;
@@ -859,8 +885,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               font-weight: 700 !important;
             `;
             } else {
-              nickname.style =
-                "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+              nickname.style = "overflow: unset;";
             }
 
             if (customs.discord) {
@@ -886,16 +911,16 @@ document.addEventListener("DOMContentLoaded", async () => {
               });
             }
           } else {
-            nickname.querySelector(".juice-badges")?.remove();
-            nickname.style =
-              "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+            playerLeft.querySelector(".juice-badges")?.remove();
+            nickname.style = "";
+            playerLeft.style = "";
           }
         });
       } else {
         tabplayers.forEach((player) => {
           player.querySelector(".juice-badges")?.remove();
-          player.querySelector(".nickname").style =
-            "display: flex !important; align-items: flex-end !important; gap: 0.25rem !important; max-width: unset !important;";
+          player.querySelector(".nickname").style = "";
+          player.querySelector(".player-left").style = "";
         });
       }
 
@@ -997,7 +1022,7 @@ document.addEventListener("DOMContentLoaded", async () => {
               }
               badgesElem = document.createElement("div");
               badgesElem.style =
-                "display: flex; gap: 0.25rem; align-items: center;";
+                "display: flex; gap: 0.25rem; align-items: center; width: 0;";
               badgesElem.className = "juice-badges";
               badgesElem.dataset.shortId = shortId;
               nickname.appendChild(badgesElem);
@@ -1088,7 +1113,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   ipcRenderer.on("url-change", (e, url) => {
-    console.log(url);
     if (url === "https://kirka.io/") {
       handleLobby();
     }

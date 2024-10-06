@@ -45,6 +45,7 @@ class Menu {
     this.handleTabChanges();
     this.handleDropdowns();
     this.handleSearch();
+    this.handleButtons();
     this.localStorage.getItem("juice-menu-tab")
       ? this.handleTabChange(
           this.menu.querySelector(
@@ -237,6 +238,18 @@ class Menu {
           ? "flex"
           : "none";
       });
+    });
+  }
+
+  handleButtons() {
+    const openSwapperFolder = this.menu.querySelector("#open-swapper-folder");
+    openSwapperFolder.addEventListener("click", () => {
+      ipcRenderer.send("open-swapper-folder");
+    });
+
+    const openScriptsFolder = this.menu.querySelector("#open-scripts-folder");
+    openScriptsFolder.addEventListener("click", () => {
+      ipcRenderer.send("open-scripts-folder");
     });
   }
 }

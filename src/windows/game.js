@@ -1,4 +1,4 @@
-const { BrowserWindow, ipcMain, app } = require("electron");
+const { BrowserWindow, ipcMain, app, shell } = require("electron");
 const { default_settings } = require("../util/defaults.json");
 const { registerShortcuts } = require("../util/shortcuts");
 const { applySwitches } = require("../util/switches");
@@ -31,6 +31,34 @@ ipcMain.on("get-settings", (e) => {
 ipcMain.on("update-setting", (e, key, value) => {
   settings[key] = value;
   store.set("settings", settings);
+});
+
+ipcMain.on("open-swapper-folder", () => {
+  const swapperPath = path.join(
+    app.getPath("documents"),
+    "JuiceClient/swapper/assets"
+  );
+
+  if (!fs.existsSync(swapperPath)) {
+    fs.mkdirSync(swapperPath, { recursive: true });
+    shell.openPath(swapperPath);
+  } else {
+    shell.openPath(swapperPath);
+  }
+});
+
+ipcMain.on("open-scripts-folder", () => {
+  const scriptsPath = path.join(
+    app.getPath("documents"),
+    "JuiceClient/scripts"
+  );
+
+  if (!fs.existsSync(scriptsPath)) {
+    fs.mkdirSync(scriptsPath, { recursive: true });
+    shell.openPath(scriptsPath);
+  } else {
+    shell.openPath(scriptsPath);
+  }
 });
 
 let gameWindow;
@@ -113,6 +141,9 @@ const createWindow = () => {
   });
 
   gameWindow.loadURL("https://kirka.io");
+  gameWindow.webContents.setUserAgent(
+    `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Electron/10.4.7 JuiceClient/${app.getVersion()}`
+  );
   gameWindow.removeMenu();
   gameWindow.maximize();
 

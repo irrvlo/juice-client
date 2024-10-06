@@ -4,6 +4,7 @@
 />
 <style>
   @import url("https://fonts.cdnfonts.com/css/satoshi");
+  @import url("https://irrvlo.xyz/nameless-font.css");
   .menu[data-theme="dark"] {
     --dark: 20, 20, 20;
     --light: 255, 255, 255;
@@ -33,6 +34,141 @@
     --shadow: 0, 0, 0, 0.5;
     --opacity-half: 0, 0, 0, 0.5;
     --opacity-quarter: 0, 0, 0, 0.25;
+  }
+  .menu[data-theme="juice"] {
+    --dark: 255, 147, 45;
+    --light: 255, 239, 224;
+    --orange: 172, 250, 112;
+    --green: 255, 147, 45;
+    --blue: 88, 101, 242;
+    --red: 255, 0, 0;
+    --hover-dark: 255, 239, 224;
+    --hover-light: 0, 0, 0, 0.1;
+    --border: 255, 239, 224, 0.15;
+    --border-active: 0, 0, 0, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 239, 224, 0.9;
+    --opacity-quarter: 255, 239, 224, 0.8;
+  }
+  .menu[data-theme="inverted-juice"] {
+    --dark: 83,5,143;
+    --light: 226, 189, 255;
+    --orange: 0,108,210;
+    --green: 44,37,164;
+    --blue: 18,71,185;
+    --red: 255, 0, 0;
+    --hover-dark: 226, 189, 255;
+    --hover-light: 0, 0, 0, 0.1;
+    --border: 226, 189, 255, 0.15;
+    --border-active: 0, 0, 0, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 226, 189, 255, 0.9;
+    --opacity-quarter: 226, 189, 255, 0.8;
+  }
+  .menu[data-theme="inverted-juice"] .about-top.header > img {
+    filter: invert(1);
+  }
+  .menu[data-theme='nameless'] {
+    font-family: 'Forza', sans-serif;
+    --dark: 28, 27, 34;
+    --light: 255, 255, 255;
+    --orange: 245, 200, 97;
+    --green: 180, 236, 121;
+    --blue: 97, 141, 245;
+    --red: 244, 91, 91;
+    --hover-dark: 34, 34, 43;
+    --hover-light: 255, 255, 255, 0.05;
+    --border: 255, 255, 255, 0.15;
+    --border-active: 255, 255, 255, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 255, 255, 0.5;
+    --opacity-quarter: 255, 255, 255, 0.25;
+  }
+  .menu[data-theme="kirka-arena"] {
+    background: linear-gradient(
+      to bottom left,
+      rgb(0,141,0),
+      rgb(19,51,1)
+    );
+    --dark: 8,96,4;
+    --light: 255, 255, 255;
+    --orange: 11,197,6;
+    --green: 172, 250, 112;
+    --blue: 88, 101, 242;
+    --red: 255, 0, 0;
+    --hover-dark: 0,129,0;
+    --hover-light: 0, 0, 0, 0.2;
+    --border: 255, 255, 255, 0.15;
+    --border-active: 255, 255, 255, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 255, 255, 0.75;
+    --opacity-quarter: 255, 255, 255, 0.5;
+  }
+  .menu[data-theme="kirka-arena"]:before {
+    content: "";
+    position: absolute;
+    border-radius: 0.75rem;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url(https://irrvlo.xyz/topo.svg);
+    background-size: cover;
+    background-position: center;
+    mix-blend-mode: color-dodge;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .menu[data-theme='kirka'] {
+    font-family: 'Exo 2', sans-serif;
+    border: 4px solid #3e4d7c;
+    border-top: 4px solid #4d5c8b;
+    border-bottom: 4px solid #26335b;
+    border-radius: 0;
+    box-shadow: unset;
+    --dark: 59, 73, 117;
+    --light: 255, 255, 255;
+    --orange: 255, 185, 20;
+    --green: 28, 206, 108;
+    --blue: 47, 128, 237;
+    --red: 255, 102, 102;
+    --hover-dark: 34, 34, 43;
+    --hover-light: 255, 255, 255, 0.05;
+    --border: 255, 255, 255, 0.15;
+    --border-active: 255, 255, 255, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 255, 255, 255, 0.5;
+    --opacity-quarter: 255, 255, 255, 0.25;
+  }
+  .menu[data-theme="catppuccin-mocha"] {
+    --dark: 30, 30, 46;
+    --light: 205, 214, 244;
+    --orange: 203, 166, 247;
+    --green: 166, 227, 161;
+    --blue: 137, 180, 250;
+    --red: 243, 139, 168;
+    --hover-dark: 24, 24, 37;
+    --hover-light: 205, 214, 244, 0.05;
+    --border: 205, 214, 244, 0.15;
+    --border-active: 205, 214, 244, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 205, 214, 244, 0.5;
+    --opacity-quarter: 205, 214, 244, 0.25;
+  }
+  .menu[data-theme="flexoki"] {
+    --dark: 16,15,15;
+    --light: 206,205,195;
+    --orange: 218,112,44;
+    --green: 135,154,57;
+    --blue: 67,133,190;
+    --red: 209,77,65;
+    --hover-dark: 31, 31, 31;
+    --hover-light: 206,205,195, 0.05;
+    --border: 206,205,195, 0.15;
+    --border-active: 206,205,195, 0.25;
+    --shadow: 0, 0, 0, 0.5;
+    --opacity-half: 206,205,195, 0.5;
+    --opacity-quarter: 206,205,195, 0.25;
   }
   .menu[data-theme="legacy"] {
     background: linear-gradient(
@@ -82,7 +218,7 @@
     font-family: "Satoshi", sans-serif;
     display: none;
     width: 55rem;
-    height: 36rem;
+    height: 36.5rem;
     background: rgba(var(--dark), 1);
     border-radius: 0.75rem;
     border: 1px solid rgba(var(--border));
@@ -215,6 +351,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
   }
   .menu .option.dropdown {
     flex-direction: column;
@@ -481,6 +618,26 @@
   }
   .author {
     color: rgba(var(--light), 0.5);
+  }
+
+  .juice-button {
+    width: 100%;
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(var(--dark), 0.1);
+    border: 0.1rem solid rgba(var(--border));
+    border-radius: 0.5rem;
+    color: rgba(var(--opacity-half));
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Satoshi", sans-serif;
+    outline: none;
+  }
+
+  .juice-button:hover {
+    background: rgba(var(--hover-light));
   }
 </style>
 <div class="menu" data-theme="dark" data-active="true">
@@ -811,8 +968,27 @@
           <select id="menu_theme" data-setting="menu_theme">
             <option value="dark">Dark</option>
             <option value="light">Light</option>
+            <option value="juice">Juice</option>
+            <option value="inverted-juice">Inverted Juice</option>
+            <option value="nameless">Nameless</option>
+            <option value="kirka-arena">Kirka Arena</option>
+            <option value="kirka">Kirka</option>
+            <option value="catppuccin-mocha">Catppuccin Mocha</option>
+            <option value="flexoki">Flexoki</option>
             <option value="legacy">Legacy</option>
           </select>
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="option">
+          <button id="open-swapper-folder" class="juice-button">
+            Open Swapper Folder
+            <div class="custom-border"></div>
+          </button>
+          <button id="open-scripts-folder" class="juice-button">
+            Open Scripts Folder
+            <div class="custom-border"></div>
+          </button>
         </div>
       </div>
     </div>
@@ -838,7 +1014,7 @@
     </div>
     <div id="about-client" class="juice options">
       <div class="option-group">
-        <div class="about-top">
+        <div class="about-top header">
           <img src="https://juice.irrvlo.xyz/juice.png" />
           <div class="about-info">
             <span class="title">Juice Client</span>
