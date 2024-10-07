@@ -36,6 +36,15 @@ const initResourceSwapper = () => {
     files: {},
   };
 
+  const proxyUrls = [
+    "cloudyfrogs.com",
+    "snipers.io",
+    "ask101math.com",
+    "fpsiogame.com",
+    "cloudconverts.com",
+    "kirka.io",
+  ];
+
   const allFilesSync = (dir) => {
     fs.readdirSync(dir).forEach((file) => {
       const filePath = path.join(dir, file);
@@ -47,16 +56,17 @@ const initResourceSwapper = () => {
           );
         if (!useAssets) return;
 
-        const kirk =
-          "*://" +
-          (useAssets ? "kirka.io" : "") +
-          filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/") +
-          "*";
-        swap.filter.urls.push(kirk);
-        swap.files[kirk.replace(/\*/g, "")] = url.format({
-          pathname: filePath,
-          protocol: "",
-          slashes: false,
+        proxyUrls.forEach((proxy) => {
+          const kirk =
+            `*://${proxy}` +
+            filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/") +
+            "*";
+          swap.filter.urls.push(kirk);
+          swap.files[kirk.replace(/\*/g, "")] = url.format({
+            pathname: filePath,
+            protocol: "",
+            slashes: false,
+          });
         });
       }
     });

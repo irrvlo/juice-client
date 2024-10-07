@@ -1,11 +1,15 @@
 const Menu = require("./menu");
 const { opener } = require("../addons/opener");
+const { customReqScripts } = require("../addons/customReqScripts");
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
 const scriptsPath = ipcRenderer.sendSync("get-scripts-path");
 const scripts = fs.readdirSync(scriptsPath);
+
+const settings = ipcRenderer.sendSync("get-settings");
+const base_url = settings.base_url;
 
 scripts.forEach((script) => {
   if (!script.endsWith(".js")) return;
@@ -14,7 +18,7 @@ scripts.forEach((script) => {
   require(scriptPath);
 });
 
-if (!window.location.href.startsWith("https://kirka.io")) {
+if (!window.location.href.startsWith(base_url)) {
   delete window.process;
   delete window.require;
   return;
@@ -25,13 +29,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   menu.init();
 
   opener();
+  customReqScripts(base_url);
 
   const fetchAll = async () => {
     const [customizations, user] = await Promise.all([
       fetch("https://juice-api.irrvlo.xyz/api/customizations").then((res) =>
         res.json()
       ),
-      fetch("https://api.kirka.io/api/user", {
+      fetch(`https://api.kirka.io/api/user`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -203,10 +208,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (newsItem.link) {
         div.onclick = () => {
-          if (newsItem.link.startsWith("https://kirka.io")) {
+          if (newsItem.link.startsWith("https://kirka.io/")) {
             window.location.href = newsItem.link;
           } else {
-            window.open(newsItem.link, "_blank");
+            const proxiedLink = newsItem.link.replace(
+              "https://kirka.io/",
+              base_url
+            );
+            window.open(proxiedLink, "_blank");
           }
         };
       }
@@ -579,7 +588,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     replaceMapImages();
 
     let interval = setInterval(() => {
-      if (!window.location.href.startsWith("https://kirka.io/servers")) {
+      if (!window.location.href.startsWith(`${base_url}servers/`)) {
         clearInterval(interval);
       }
       replaceMapImages();
@@ -589,7 +598,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (e.shiftKey && e.target.classList.contains("author-name")) {
         setTimeout(() => {
           navigator.clipboard.readText().then((text) => {
-            window.location.href = `https://kirka.io/profile/${text.replace(
+            window.location.href = `${base_url}profile/${text.replace(
               "#",
               ""
             )}`;
@@ -607,7 +616,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const settings = ipcRenderer.sendSync("get-settings");
 
     const interval = setInterval(() => {
-      if (!window.location.href.startsWith("https://kirka.io/profile")) {
+      if (!window.location.href.startsWith(`${base_url}profile/`)) {
         clearInterval(interval);
       }
 
@@ -824,7 +833,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     const interval = setInterval(() => {
-      if (!window.location.href.startsWith("https://kirka.io/games")) {
+      if (!window.location.href.startsWith(`${base_url}games/`)) {
         clearInterval(interval);
       }
 
@@ -937,10 +946,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const handleMarket = () => {
     const interval = setInterval(() => {
-      if (!window.location.href === "https://kirka.io/hub/market") {
+      if (!window.location.href === `${base_url}hub/market`) {
         clearInterval(interval);
+        return;
       }
+
       const subjects = document.querySelectorAll(".subject");
+
       subjects.forEach((subject) => {
         const count = subject.querySelector(".count");
         if (count && !count.dataset.formatted) {
@@ -962,7 +974,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const online = e.target;
         if (online && online.innerText.includes("in game")) {
           const content = online.innerText.match(/\[(.*?)\]/)[1];
-          const gameLink = `https://kirka.io/games/${content}`;
+          const gameLink = `${base_url}games/${content}`;
           navigator.clipboard.writeText(gameLink);
           customNotification({
             message: `Copied game link to clipboard: ${gameLink}`,
@@ -972,7 +984,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     const interval = setInterval(() => {
-      if (!window.location.href.startsWith("https://kirka.io/friends")) {
+      if (!window.location.href.startsWith(`${base_url}friends`)) {
         clearInterval(interval);
       }
 
@@ -1113,44 +1125,44 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   ipcRenderer.on("url-change", (e, url) => {
-    if (url === "https://kirka.io/") {
+    if (url === `${base_url}`) {
       handleLobby();
     }
-    if (url.startsWith("https://kirka.io/servers/")) {
+    if (url.startsWith(`${base_url}servers/`)) {
       handleServers();
     }
-    if (url.startsWith("https://kirka.io/profile/")) {
+    if (url.startsWith(`${base_url}profile/`)) {
       handleProfile();
     }
-    if (url.startsWith("https://kirka.io/games/")) {
+    if (url.startsWith(`${base_url}games/`)) {
       handleInGame();
     }
-    if (url === "https://kirka.io/hub/market") {
+    if (url === `${base_url}hub/market`) {
       handleMarket();
     }
-    if (url === "https://kirka.io/friends") {
+    if (url === `${base_url}friends`) {
       handleFriends();
     }
   });
 
   const handleInitialLoad = () => {
     const url = window.location.href;
-    if (url.startsWith("https://kirka.io/") && !url.includes("games")) {
+    if (url.startsWith(`${base_url}`) && !url.includes("games")) {
       handleLobby();
     }
-    if (url.startsWith("https://kirka.io/servers/")) {
+    if (url.startsWith(`${base_url}servers/`)) {
       handleServers();
     }
-    if (url.startsWith("https://kirka.io/profile/")) {
+    if (url.startsWith(`${base_url}profile/`)) {
       handleProfile();
     }
-    if (url.startsWith("https://kirka.io/games/")) {
+    if (url.startsWith(`${base_url}games/`)) {
       handleInGame();
     }
-    if (url === "https://kirka.io/hub/market") {
+    if (url === `${base_url}hub/market`) {
       handleMarket();
     }
-    if (url === "https://kirka.io/friends") {
+    if (url === `${base_url}friends`) {
       handleFriends();
     }
 

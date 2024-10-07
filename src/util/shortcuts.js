@@ -1,5 +1,8 @@
 const { app, clipboard } = require("electron");
+const Store = require("electron-store");
 const shortcut = require("electron-localshortcut");
+
+const store = new Store();
 
 const registerShortcuts = (window) => {
   const register = (key, action) => shortcut.register(window, key, action);
@@ -17,7 +20,10 @@ const registerShortcuts = (window) => {
       window.webContents.send("notification", data);
     });
   });
-  register("F4", () => window.loadURL("https://kirka.io"));
+  register("F4", () => {
+    const settings = store.get("settings");
+    window.loadURL(settings.base_url);
+  });
   register("F5", () => window.reload());
   register("F6", () => window.loadURL(clipboard.readText()));
   register("F7", () => clipboard.writeText(window.webContents.getURL()));

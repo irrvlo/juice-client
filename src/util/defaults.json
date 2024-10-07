@@ -24,6 +24,15 @@
     "general_news": true,
     "promotional_news": true,
     "event_news": true,
-    "alert_news": true
-  }
+    "alert_news": true,
+    "base_url": "https://kirka.io/"
+  },
+  "allowed_urls": [
+    "https://kirka.io/",
+    "https://cloudyfrogs.com/",
+    "https://snipers.io/",
+    "https://ask101math.com/",
+    "https://fpsiogame.com/",
+    "https://cloudconverts.com/"
+  ]
 }

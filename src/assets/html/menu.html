@@ -51,11 +51,11 @@
     --opacity-quarter: 255, 239, 224, 0.8;
   }
   .menu[data-theme="inverted-juice"] {
-    --dark: 83,5,143;
+    --dark: 83, 5, 143;
     --light: 226, 189, 255;
-    --orange: 0,108,210;
-    --green: 44,37,164;
-    --blue: 18,71,185;
+    --orange: 0, 108, 210;
+    --green: 44, 37, 164;
+    --blue: 18, 71, 185;
     --red: 255, 0, 0;
     --hover-dark: 226, 189, 255;
     --hover-light: 0, 0, 0, 0.1;
@@ -68,8 +68,8 @@
   .menu[data-theme="inverted-juice"] .about-top.header > img {
     filter: invert(1);
   }
-  .menu[data-theme='nameless'] {
-    font-family: 'Forza', sans-serif;
+  .menu[data-theme="nameless"] {
+    font-family: "Forza", sans-serif;
     --dark: 28, 27, 34;
     --light: 255, 255, 255;
     --orange: 245, 200, 97;
@@ -85,18 +85,14 @@
     --opacity-quarter: 255, 255, 255, 0.25;
   }
   .menu[data-theme="kirka-arena"] {
-    background: linear-gradient(
-      to bottom left,
-      rgb(0,141,0),
-      rgb(19,51,1)
-    );
-    --dark: 8,96,4;
+    background: linear-gradient(to bottom left, rgb(0, 141, 0), rgb(19, 51, 1));
+    --dark: 8, 96, 4;
     --light: 255, 255, 255;
-    --orange: 11,197,6;
+    --orange: 11, 197, 6;
     --green: 172, 250, 112;
     --blue: 88, 101, 242;
     --red: 255, 0, 0;
-    --hover-dark: 0,129,0;
+    --hover-dark: 0, 129, 0;
     --hover-light: 0, 0, 0, 0.2;
     --border: 255, 255, 255, 0.15;
     --border-active: 255, 255, 255, 0.25;
@@ -119,8 +115,8 @@
     opacity: 0.5;
     pointer-events: none;
   }
-  .menu[data-theme='kirka'] {
-    font-family: 'Exo 2', sans-serif;
+  .menu[data-theme="kirka"] {
+    font-family: "Exo 2", sans-serif;
     border: 4px solid #3e4d7c;
     border-top: 4px solid #4d5c8b;
     border-bottom: 4px solid #26335b;
@@ -156,19 +152,19 @@
     --opacity-quarter: 205, 214, 244, 0.25;
   }
   .menu[data-theme="flexoki"] {
-    --dark: 16,15,15;
-    --light: 206,205,195;
-    --orange: 218,112,44;
-    --green: 135,154,57;
-    --blue: 67,133,190;
-    --red: 209,77,65;
+    --dark: 16, 15, 15;
+    --light: 206, 205, 195;
+    --orange: 218, 112, 44;
+    --green: 135, 154, 57;
+    --blue: 67, 133, 190;
+    --red: 209, 77, 65;
     --hover-dark: 31, 31, 31;
-    --hover-light: 206,205,195, 0.05;
-    --border: 206,205,195, 0.15;
-    --border-active: 206,205,195, 0.25;
+    --hover-light: 206, 205, 195, 0.05;
+    --border: 206, 205, 195, 0.15;
+    --border-active: 206, 205, 195, 0.25;
     --shadow: 0, 0, 0, 0.5;
-    --opacity-half: 206,205,195, 0.5;
-    --opacity-quarter: 206,205,195, 0.25;
+    --opacity-half: 206, 205, 195, 0.5;
+    --opacity-quarter: 206, 205, 195, 0.25;
   }
   .menu[data-theme="legacy"] {
     background: linear-gradient(
@@ -195,7 +191,12 @@
     color: black;
   }
   .menu ::-webkit-scrollbar {
-    display: none;
+    width: 0.25rem;
+    background: rgba(var(--dark), 0.1);
+  }
+  .menu ::-webkit-scrollbar-thumb {
+    background: rgba(var(--border));
+    border-radius: 0.5rem;
   }
   @keyframes rotateHue {
     0% {
@@ -218,7 +219,7 @@
     font-family: "Satoshi", sans-serif;
     display: none;
     width: 55rem;
-    height: 36.5rem;
+    height: 36rem;
     background: rgba(var(--dark), 1);
     border-radius: 0.75rem;
     border: 1px solid rgba(var(--border));
@@ -343,6 +344,9 @@
     background: rgba(var(--hover-light));
     padding: 1rem;
     border-radius: 0.5rem;
+  }
+  .menu .option-group:last-child {
+    margin-bottom: 1rem;
   }
   .menu .option-group.bottom {
     margin-top: auto;
@@ -620,24 +624,116 @@
     color: rgba(var(--light), 0.5);
   }
 
+  .credits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .credits > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .credits p {
+    font-size: 0.8rem;
+    color: rgba(var(--light), 0.8);
+    margin: unset;
+  }
+
+  .credits .title {
+    font-size: 1rem;
+  }
+
   .juice-button {
     width: 100%;
     height: 2.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     background: rgba(var(--dark), 0.1);
+    color: rgba(var(--light));
     border: 0.1rem solid rgba(var(--border));
     border-radius: 0.5rem;
-    color: rgba(var(--opacity-half));
     cursor: pointer;
     transition: 0.2s;
     font-family: "Satoshi", sans-serif;
     outline: none;
   }
 
+  .juice-button.large {
+    height: 3rem;
+  }
+
   .juice-button:hover {
     background: rgba(var(--hover-light));
+  }
+
+  #modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 0.75rem;
+    z-index: 9999;
+  }
+
+  #modal .content {
+    position: relative;
+    width: 30rem;
+    height: 15rem;
+    background: rgba(var(--dark), 1);
+    border-radius: 0.75rem;
+    color: rgba(var(--light), 1);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  #modal .bottom,
+  #modal .top {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  #modal .title {
+    font-size: 1.5rem;
+  }
+
+  #modal .description {
+    font-size: 0.9rem;
+    color: rgba(var(--opacity-half));
+  }
+
+  #modal input {
+    width: 100%;
+  }
+
+  #modal .close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: grid;
+    place-items: center;
+    background: rgba(var(--dark), 0.1);
+    color: rgba(var(--opacity-half));
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  #modal .close:hover {
+    color: rgba(var(--light));
   }
 </style>
 <div class="menu" data-theme="dark" data-active="true">
@@ -981,12 +1077,60 @@
       </div>
       <div class="option-group">
         <div class="option">
+          <span>Proxy URL</span>
+          <select id="base_url" data-setting="base_url">
+            <option value="https://kirka.io/">https:/kirka.io/</option>
+            <option value="https://cloudyfrogs.com/">
+              https://cloudyfrogs.com/
+            </option>
+            <option value="https://snipers.io/">https://snipers.io/</option>
+            <option value="https://ask101math.com/">
+              https://ask101math.com/
+            </option>
+            <option value="https://fpsiogame.com/">
+              https://fpsiogame.com/
+            </option>
+            <option value="https://cloudconverts.com/">
+              https://cloudconverts.com/
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="option">
           <button id="open-swapper-folder" class="juice-button">
-            Open Swapper Folder
+            <span class="text">Open Swapper Folder</span>
             <div class="custom-border"></div>
           </button>
           <button id="open-scripts-folder" class="juice-button">
-            Open Scripts Folder
+            <span class="text">Open Scripts Folder</span>
+            <div class="custom-border"></div>
+          </button>
+        </div>
+        <div class="option">
+          <button id="import-settings" class="juice-button">
+            <span class="text">Import Settings</span>
+            <div class="custom-border"></div>
+          </button>
+          <button id="export-settings" class="juice-button">
+            <span class="text">Export Settings</span>
+            <div class="custom-border"></div>
+          </button>
+        </div>
+        <div class="option">
+          <button id="reset-juice-settings" class="juice-button large">
+            <span class="text">Reset Juice Client Settings</span>
+            <span class="description"> This action cannot be undone</span>
+            <div class="custom-border"></div>
+          </button>
+        </div>
+        <div class="option">
+          <button id="remote-to-static-links" class="juice-button large">
+            <span class="test">Replace Remote Links with Static Links</span>
+            <span class="description">
+              This will speed up your customizations. This action cannot be
+              undone
+            </span>
             <div class="custom-border"></div>
           </button>
         </div>
@@ -1086,6 +1230,17 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="credits">
+          <span class="title">A special thanks to these people!</span>
+          <p>
+            - CarrySheriff for Chest/Pack opener, Map Images Repo, Market Names,
+            and Custom List Price
+          </p>
+          <p>- Sam for a basic Resource Swapper</p>
+          <p>- Error430 for optimizations</p>
         </div>
       </div>
     </div>

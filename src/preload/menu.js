@@ -251,6 +251,177 @@ class Menu {
     openScriptsFolder.addEventListener("click", () => {
       ipcRenderer.send("open-scripts-folder");
     });
+
+    const importSettings = this.menu.querySelector("#import-settings");
+    importSettings.addEventListener("click", () => {
+      const modal = this.createModal(
+        "Import settings",
+        "Paste your settings here to import them"
+      );
+
+      const bottom = modal.querySelector(".bottom");
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Paste settings here";
+      bottom.appendChild(input);
+
+      const confirm = document.createElement("button");
+      confirm.innerText = "Confirm";
+      confirm.classList.add("juice-button");
+      confirm.addEventListener("click", () => {
+        try {
+          if (!input.value) return;
+
+          const settings = JSON.parse(input.value);
+          for (const key in settings) {
+            this.settings[key] = settings[key];
+            ipcRenderer.send("update-setting", key, settings[key]);
+
+            const event = new CustomEvent("juice-settings-changed", {
+              detail: { setting: key, value: settings[key] },
+            });
+            document.dispatchEvent(event);
+
+            this.initMenu();
+          }
+          modal.remove();
+        } catch (error) {
+          console.error("Error importing settings:", error);
+        }
+      });
+
+      bottom.appendChild(confirm);
+
+      this.menu.querySelector(".menu").appendChild(modal);
+    });
+
+    const exportSettings = this.menu.querySelector("#export-settings");
+    exportSettings.addEventListener("click", () => {
+      const modal = this.createModal(
+        "Export settings",
+        "Copy your settings here to export them"
+      );
+
+      const bottom = modal.querySelector(".bottom");
+
+      const textarea = document.createElement("textarea");
+      textarea.value = JSON.stringify(this.settings, null, 2);
+      bottom.appendChild(textarea);
+
+      const copy = document.createElement("button");
+      copy.innerText = "Copy";
+      copy.classList.add("juice-button");
+      copy.addEventListener("click", () => {
+        navigator.clipboard.writeText(textarea.value);
+      });
+
+      bottom.appendChild(copy);
+
+      this.menu.querySelector(".menu").appendChild(modal);
+    });
+
+    let clickCounter = 0;
+    const resetJuiceSettings = this.menu.querySelector("#reset-juice-settings");
+    resetJuiceSettings.addEventListener("click", () => {
+      clickCounter++;
+      if (clickCounter === 1) {
+        resetJuiceSettings.style.background = "rgba(var(--red), 0.25)";
+        const text = resetJuiceSettings.querySelector(".text");
+        text.innerText = "Are you sure?";
+
+        const description = resetJuiceSettings.querySelector(".description");
+        description.innerText =
+          "This will restart the client and reset all settings. Click again to confirm";
+      } else if (clickCounter === 2) {
+        ipcRenderer.send("reset-juice-settings");
+      }
+    });
+
+    const remoteToStaticLinks = this.menu.querySelector(
+      "#remote-to-static-links"
+    );
+    remoteToStaticLinks.addEventListener("click", async () => {
+      const localStorageKeys = [
+        "SETTINGS___SETTING/CROSSHAIR___SETTING/STATIC_URL___SETTING",
+        "SETTINGS___SETTING/SNIPER___SETTING/SCOPE_URL___SETTING",
+        "SETTINGS___SETTING/BLOCKS___SETTING/TEXTURE_URL___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG1___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG2___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG3___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG4___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG5___SETTING",
+        "SETTINGS___SETTING/SKYBOX___SETTING/TEXTURE_IMG6___SETTING",
+      ];
+
+      const juiceKeys = ["css_link", "hitmarker_link", "killicon_link"];
+
+      const encodeImage = async (url) => {
+        if (!url || url === "") return "";
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok)
+            throw new Error(`Invalid response: ${response.status}`);
+          const blob = await response.blob();
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error(`Error fetching or converting ${url}:`, error);
+        }
+      };
+
+      for (const key of localStorageKeys) {
+        const url = localStorage.getItem(key).replace(/"/g, "");
+        const data = await encodeImage(url);
+        localStorage.setItem(key, data);
+      }
+
+      for (const key of juiceKeys) {
+        const url = this.settings[key];
+        const data = await encodeImage(url);
+        this.settings[key] = data;
+        ipcRenderer.send("update-setting", key, data);
+
+        const event = new CustomEvent("juice-settings-changed", {
+          detail: { setting: key, value: this.settings[key] },
+        });
+        document.dispatchEvent(event);
+
+        this.initMenu();
+      }
+    });
+  }
+
+  createModal(title, description) {
+    const modal = document.createElement("div");
+    modal.id = "modal";
+
+    modal.innerHTML = `
+    <div class="content">
+      <div class="close">
+        <i class="fas fa-times"></i>
+      </div>
+      <div class="top">
+        <span class="title">${title}</span>
+        <span class="description">${description}</span>
+      </div>
+      <div class="bottom">
+      </div>
+    </div>
+    `;
+
+    const close = modal.querySelector(".close");
+    close.addEventListener("click", () => modal.remove());
+
+    modal.addEventListener("click", (e) => {
+      if (e.target.id === "modal") modal.remove();
+    });
+
+    return modal;
   }
 }
 
