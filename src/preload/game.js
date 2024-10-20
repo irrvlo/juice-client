@@ -59,6 +59,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     return link.replace(/\\/g, "/");
   };
 
+  const lobbyKeybindReminder = (settings) => {
+    const keybindReminder = document.createElement("span");
+    keybindReminder.id = "juice-keybind-reminder";
+    keybindReminder.style = `position: absolute; left: 147px; bottom: 10px; font-size: 0.9rem; color: #fff;`;
+
+    const scaleFactor = Math.min(
+      1,
+      window.innerWidth / 1600,
+      window.innerHeight / 900
+    );
+
+    keybindReminder.style.transform = `scale(${scaleFactor})`;
+    keybindReminder.innerText = `Press ${settings.menu_keybind} to open the client menu.`;
+
+    if (
+      !document.querySelector("#app > .interface") ||
+      document.querySelector("#juice-keybind-reminder")
+    ) {
+      return;
+    }
+
+    document.querySelector("#app > .interface").appendChild(keybindReminder);
+    document.addEventListener("juice-settings-changed", (e) => {
+      if (e.detail.setting === "menu_keybind") {
+        const keybindReminder = document.getElementById(
+          "juice-keybind-reminder"
+        );
+        if (keybindReminder) {
+          keybindReminder.innerText = `Press ${e.detail.value} to open the client menu.`;
+        }
+      }
+    });
+  };
+
   const lobbyNews = async (settings) => {
     if (
       !document.querySelector("#app > .interface") ||
@@ -313,7 +347,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (settings.hide_chat) {
         styles.push(
-          ".desktop-game-interface > .chat { display: none !important; }"
+          ".desktop-game-interface > #bottom-left > .chat { display: none !important; }"
         );
       }
 
@@ -374,6 +408,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
       }
 
+      if (settings.hide_keybind_reminder) {
+        styles.push("#juice-keybind-reminder { display: none; }");
+      }
+
       addedStyles.innerHTML = styles.join("");
     };
 
@@ -388,6 +426,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "hitmarker_link",
         "ui_animations",
         "rave_mode",
+        "hide_keybind_reminder",
       ];
 
       if (relevantSettings.includes(e.detail.setting)) {
@@ -401,6 +440,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const handleLobby = () => {
     const settings = ipcRenderer.sendSync("get-settings");
 
+    lobbyKeybindReminder(settings);
     lobbyNews(settings);
     juiceDiscordButton();
 

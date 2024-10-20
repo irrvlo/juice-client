@@ -6,6 +6,7 @@
     "ui_animations": true,
     "hide_chat": false,
     "hide_interface": false,
+    "hide_keybind_reminder": false,
     "skip_loading": false,
     "interface_opacity": "100",
     "interface_bounds": "2",

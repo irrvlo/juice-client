@@ -132,8 +132,14 @@ class Menu {
       changeKeybindButton.innerText = "Press any key";
       const listener = (e) => {
         this.settings.menu_keybind = e.code;
-        ipcRenderer.send("update-setting", "menu_keybind", e.code);
         changeKeybindButton.innerText = e.code;
+        ipcRenderer.send("update-setting", "menu_keybind", e.code);
+
+        const event = new CustomEvent("juice-settings-changed", {
+          detail: { setting: "menu_keybind", value: e.code },
+        });
+        document.dispatchEvent(event);
+
         this.menu.querySelector(
           ".keybind"
         ).innerText = `Press ${this.settings.menu_keybind} to toggle menu`;
