@@ -30,6 +30,8 @@ const registerShortcuts = (window) => {
   register("F11", () => window.setFullScreen(!window.isFullScreen()));
   register("F12", () => window.webContents.openDevTools());
   register("Ctrl+Shift+I", () => window.webContents.openDevTools());
+  register("Ctrl+Shift+C", () => window.webContents.openDevTools());
+  register("Ctrl+Shift+J", () => window.webContents.openDevTools());
   register("Alt+F4", () => app.quit());
 };
 
