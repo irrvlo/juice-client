@@ -5,7 +5,7 @@ const url = require("url");
 
 const initResourceSwapper = () => {
   protocol.registerFileProtocol("juiceclient", (request, callback) =>
-    callback({ path: request.url.replace("juiceclient://", "") })
+    callback({ path: request.url.replace("juiceclient://", "") }),
   );
   protocol.registerFileProtocol("file", (request, callback) => {
     callback(decodeURIComponent(request.url.replace("file:///", "")));
@@ -14,10 +14,14 @@ const initResourceSwapper = () => {
   const SWAP_FOLDER = path.join(
     app.getPath("documents"),
     "JuiceClient",
-    "swapper"
+    "swapper",
   );
   const assetsFolder = path.join(SWAP_FOLDER, "assets");
-  const folders = ["css", "media", "img", "glb"];
+  const folders = ["css", "media", "img", "glb", "js"];
+  let folder_regex_generator = "JuiceClient[\\\\/]swapper[\\\\/]assets[\\\\/](";
+  folder_regex_generator += folders.join("|");
+  folder_regex_generator += ")[\\\\/][^\\\\/]+\\.[^.]+$";
+  let folder_regex = new RegExp(folder_regex_generator, "");
 
   try {
     if (!fs.existsSync(assetsFolder))
@@ -50,10 +54,7 @@ const initResourceSwapper = () => {
       const filePath = path.join(dir, file);
       if (fs.statSync(filePath).isDirectory()) allFilesSync(filePath);
       else {
-        const useAssets =
-          /JuiceClient[\\/]swapper[\\/]assets[\\/](css|media|img|glb)[\\/][^\\/]+\.[^.]+$/.test(
-            filePath
-          );
+        const useAssets = folder_regex.test(filePath);
         if (!useAssets) return;
 
         proxyUrls.forEach((proxy) => {
@@ -83,7 +84,7 @@ const initResourceSwapper = () => {
           (swap.files[details.url.replace(/https|http|(\?.*)|(#.*)/gi, "")] ||
             details.url);
         callback({ cancel: false, redirectURL: redirect });
-      }
+      },
     );
   }
 };
