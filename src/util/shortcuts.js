@@ -28,10 +28,10 @@ const registerShortcuts = (window) => {
   register("F6", () => window.loadURL(clipboard.readText()));
   register("F7", () => clipboard.writeText(window.webContents.getURL()));
   register("F11", () => window.setFullScreen(!window.isFullScreen()));
-  register("F12", () => window.webContents.openDevTools());
-  register("Ctrl+Shift+I", () => window.webContents.openDevTools());
-  register("Ctrl+Shift+C", () => window.webContents.openDevTools());
-  register("Ctrl+Shift+J", () => window.webContents.openDevTools());
+  register("F12", () => window.webContents.toggleDevTools());
+  register("Ctrl+Shift+I", () => window.webContents.toggleDevTools());
+  register("Ctrl+Shift+C", () => window.webContents.toggleDevTools());
+  register("Ctrl+Shift+J", () => window.webContents.toggleDevTools());
   register("Alt+F4", () => app.quit());
 };
 
