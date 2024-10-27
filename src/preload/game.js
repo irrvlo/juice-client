@@ -73,19 +73,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     keybindReminder.style.transform = `scale(${scaleFactor})`;
     keybindReminder.innerText = `Press ${settings.menu_keybind} to open the client menu.`;
 
-    if (
-      !document.querySelector("#app > .interface") ||
-      document.querySelector("#juice-keybind-reminder")
-    ) {
-      return;
-    }
+    if (!document.querySelector("#app > .interface") || document.querySelector("#juice-keybind-reminder")) return
 
     document.querySelector("#app > .interface").appendChild(keybindReminder);
-    document.addEventListener("juice-settings-changed", (e) => {
+    document.addEventListener("juice-settings-changed", e => {
       if (e.detail.setting === "menu_keybind") {
-        const keybindReminder = document.getElementById(
-          "juice-keybind-reminder"
-        );
+        const keybindReminder = document.getElementById("juice-keybind-reminder");
         if (keybindReminder) {
           keybindReminder.innerText = `Press ${e.detail.value} to open the client menu.`;
         }
@@ -94,54 +87,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const lobbyNews = async (settings) => {
-    if (
-      !document.querySelector("#app > .interface") ||
-      document.querySelector(".lobby-news")
-    )
-      return;
+    if (!document.querySelector("#app > .interface") || document.querySelector(".lobby-news")) return;
 
     const { general_news, promotional_news, event_news, alert_news } = settings;
 
-    if (!general_news && !promotional_news && !event_news && !alert_news)
-      return;
+    if (!general_news && !promotional_news && !event_news && !alert_news) return;
 
-    let news = await fetch("https://juice-api.irrvlo.xyz/api/news").then(
-      (res) => res.json()
-    );
-
+    let news = await fetch("https://juice-api.irrvlo.xyz/api/news").then(r => r.json());
     if (!news.length) return;
 
-    news = news.filter((newsItem) => {
+    news = news.filter(newsItem => {
       if (newsItem.category === "general" && !general_news) return false;
-      if (newsItem.category === "promotional" && !promotional_news)
-        return false;
+      if (newsItem.category === "promotional" && !promotional_news) return false;
       if (newsItem.category === "event" && !event_news) return false;
       if (newsItem.category === "alert" && !alert_news) return false;
       return true;
     });
 
-    const scaleFactor = Math.min(
-      1,
-      window.innerWidth / 1600,
-      window.innerHeight / 900
-    );
-
     const lobbyNewsContainer = document.createElement("div");
     lobbyNewsContainer.id = "lobby-news";
     lobbyNewsContainer.className = "lobby-news";
     lobbyNewsContainer.style = `
-      width: 250px;
+      width: 222px;
       position: absolute;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
       transform-origin: top left;
-      top: ${180 * scaleFactor}px;
-      left: ${147 * scaleFactor}px;
-      transform: scale(${scaleFactor});
-    `;
+      top: 178px;
+      left: 148px;
+      `;
 
-    document.querySelector("#app > .interface").appendChild(lobbyNewsContainer);
+    setInterval(() => {
+      if (!document.querySelector("#lobby-news")) document.querySelector("#app #left-interface").appendChild(lobbyNewsContainer)
+    }, 50)
 
     const createNewsCard = (newsItem) => {
       const div = document.createElement("div");
@@ -372,8 +351,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           settings.interface_bounds === "1"
             ? 0.9
             : settings.interface_bounds === "0"
-            ? 0.8
-            : 1;
+              ? 0.8
+              : 1;
         styles.push(
           `.desktop-game-interface { transform: scale(${scale}) !important; }`
         );
@@ -461,14 +440,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (customs.gradient) {
           lobbyNickname.style = `
               display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+            }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+            } !important;
           `;
         } else {
           lobbyNickname.style =
@@ -589,12 +566,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const interval = setInterval(() => {
       const moneys = document.querySelectorAll(".moneys > .card-cont");
       const expValues = document.querySelector(".exp-values");
-      const quests = document.querySelectorAll(
-        ".right-interface > .quests .quest"
-      );
-      const questsTabs = document.querySelector(
-        ".right-interface > .quests .tabs"
-      );
+      const quests = document.querySelectorAll(".right-interface > .quests .quest");
+      const questsTabs = document.querySelector(".right-interface > .quests .tabs");
 
       if (moneys.length && expValues && quests.length && questsTabs) {
         clearInterval(interval);
@@ -762,14 +735,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (customs.gradient) {
               nickname.querySelector(".nickname-span").style.cssText += `
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
             `;
             }
 
@@ -923,14 +894,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (customs.gradient) {
               nickname.style = `
               overflow: unset;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
               font-weight: 700 !important;
             `;
             } else {
@@ -1054,14 +1023,12 @@ document.addEventListener("DOMContentLoaded", async () => {
               gap: 0.25rem !important;
               max-width: min-width !important;
               flex-direction: row !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
               font-weight: 700 !important;
             `;
             }
@@ -1132,8 +1099,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         margin-left: 1rem;
         border: solid .15rem #ffb914;
         font-family: Exo\ 2;" class="alert-default"
-    > ${
-      data.icon
+    > ${data.icon
         ? `
         <img
           src="${data.icon}"
@@ -1143,9 +1109,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             margin-right: .9rem;"
         />`
         : ""
-    }
-      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${
-        data.message
+      }
+      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${data.message
       }</span>
     </div>`;
 
@@ -1156,7 +1121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => {
       try {
         notifElement.remove();
-      } catch {}
+      } catch { }
     }, 5000);
   };
 
