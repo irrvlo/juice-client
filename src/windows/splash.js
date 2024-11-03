@@ -1,5 +1,4 @@
-const { BrowserWindow, ipcMain } = require("electron")
-const isPackaged = require('electron-is-packaged').isPackaged
+const { app, BrowserWindow, ipcMain } = require("electron")
 const { autoUpdater } = require("electron-updater")
 const { initGame } = require("./game")
 const path = require("path")
@@ -31,7 +30,7 @@ const createWindow = () => {
   splashWindow.loadFile(path.join(__dirname, "../assets/html/splash.html"))
   splashWindow.once("ready-to-show", () => {
     splashWindow.show()
-    isPackaged ? checkForUpdates() : handleClose()
+    app.isPackaged ? checkForUpdates() : handleClose()
   })
 
   splashWindow.on("closed", () => {
