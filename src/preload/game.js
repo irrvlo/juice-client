@@ -636,7 +636,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       kdRatio = parseFloat(kdRatio).toString()
 
-      kd.innerHTML = `${kdRatio} <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`
+      kd.innerHTML = `<span class="kd-ratio">${kdRatio}</span> <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`
     }
 
     const createKD = () => {
@@ -646,10 +646,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const kd = kills?.cloneNode(true)
 
       if (!kd) return
-      kd.style.gap = "0.25rem"
       kd.classList.add("kd")
       kd.classList.remove("kill")
-      kd.innerHTML = `0 <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`
+      kd.style.display = "flex"
+      kd.style.alignItems = "center"
+      kd.style.gap = "0.25rem"
+      kd.innerHTML = `<span class="kd-ratio">0</span> <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`
 
       document.querySelector(".kill-death").appendChild(kd)
       kills.addEventListener("DOMSubtreeModified", updateKD)
