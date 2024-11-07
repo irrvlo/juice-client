@@ -17,7 +17,7 @@ class Menu {
       ui: this.menu.querySelector("#ui-options"),
       game: this.menu.querySelector("#game-options"),
       performance: this.menu.querySelector("#performance-options"),
-      misc: this.menu.querySelector("#misc-options"),
+      client: this.menu.querySelector("#client-options"),
       scripts: this.menu.querySelector("#scripts-options"),
       about: this.menu.querySelector("#about-client"),
     };
@@ -35,6 +35,7 @@ class Menu {
 
   init() {
     this.setVersion();
+    this.setUser();
     this.setKeybind();
     this.setTheme();
     this.handleKeyEvents();
@@ -59,6 +60,14 @@ class Menu {
     this.menu.querySelectorAll(".ver").forEach((element) => {
       element.innerText = `v${version}`;
     });
+  }
+
+  setUser() {
+    const user = JSON.parse(this.localStorage.getItem("current-user"));
+    console.log(user);
+    if (user) {
+      this.menu.querySelector(".user").innerText = `${user.name}#${user.shortId}`;
+    }
   }
 
   setKeybind() {
@@ -243,6 +252,15 @@ class Menu {
           .includes(searchValue)
           ? "flex"
           : "none";
+
+        const parent = setting.parentElement;
+        if (parent.classList.contains("option-group")) {
+          const children = parent.children;
+          const visibleChildren = Array.from(children).filter(
+            (child) => child.style.display === "flex"
+          );
+          parent.style.display = visibleChildren.length ? "flex" : "none";
+        }
       });
     });
   }

@@ -1,3 +1,4 @@
+require("v8-compile-cache");
 const { app } = require("electron");
 const { initSplash } = require("./windows/splash");
 const { initResourceSwapper } = require("./addons/swapper");

@@ -70,6 +70,7 @@
   }
   .menu[data-theme="nameless"] {
     font-family: "Forza", sans-serif;
+    font-weight: 400;
     --dark: 28, 27, 34;
     --light: 255, 255, 255;
     --orange: 245, 200, 97;
@@ -83,6 +84,11 @@
     --shadow: 0, 0, 0, 0.5;
     --opacity-half: 255, 255, 255, 0.5;
     --opacity-quarter: 255, 255, 255, 0.25;
+  }
+  .menu[data-theme="nameless"] input[type="text"],
+  .menu[data-theme="nameless"] textarea,
+  .menu[data-theme="nameless"] select {
+    font-family: "Forza", sans-serif !important;
   }
   .menu[data-theme="kirka-arena"] {
     background: linear-gradient(to bottom left, rgb(0, 141, 0), rgb(19, 51, 1));
@@ -225,8 +231,7 @@
     border: 1px solid rgba(var(--border));
     box-shadow: 0 0 1rem rgba(var(--shadow));
     color: rgba(var(--light), 1);
-    grid-template-columns: 1.25fr 2.75fr;
-    grid-template-rows: 100%;
+    grid-template-columns: 1fr 3fr;
     grid-template-areas: "sidebar content";
     transition: 0.3s;
     z-index: 9999;
@@ -362,14 +367,13 @@
     align-items: flex-start;
     overflow: hidden;
     transition: 0.2s;
+    gap: 0;
   }
   .menu .option.dropdown .content {
     height: 0;
     width: 100%;
-    transition: 0.2s ease;
   }
   .menu .option.dropdown.active .content {
-    margin-top: 1rem;
     height: 100%;
   }
   .menu .option.dropdown i {
@@ -380,7 +384,8 @@
     transform: rotate(0deg);
   }
   .menu textarea {
-    min-height: 4rem;
+    margin-top: 1rem;
+    min-height: 6rem;
     width: 100%;
     resize: vertical;
     padding: 0.5rem;
@@ -390,7 +395,6 @@
     color: rgb(var(--light));
     font-family: "Satoshi", sans-serif;
     outline: none;
-    transition: 0.2s ease;
   }
   .menu .range {
     appearance: none;
@@ -435,10 +439,26 @@
     font-size: 0.8rem;
     color: rgba(var(--opacity-half));
   }
-  .menu .restart:after,
-  .menu .requires-restart > span:after {
-    content: "*";
+  .menu .requries-restart,
+  .menu .requires-refresh {
+    position: relative;
+  }
+  .menu .requires-restart > span:not(.description):after {
+    content: "Requires Restart";
     color: rgba(var(--red));
+    font-size: 0.75rem;
+    padding: 0.15rem 0.3rem;
+    background: rgba(var(--red), 0.1);
+    border-radius: 0.25rem;
+    margin-left: 0.25rem;
+  }
+  .menu .requires-refresh > span:not(.description):after {
+    content: "Requires Refresh";
+    color: rgba(var(--blue));
+    font-size: 0.75rem;
+    padding: 0.15rem 0.3rem;
+    background: rgba(var(--blue), 0.1);
+    border-radius: 0.25rem;
     margin-left: 0.25rem;
   }
   .menu .search-input {
@@ -759,9 +779,9 @@
         <i class="fas fa-tachometer-alt"></i>
         Performance
       </div>
-      <div data-tab="misc" class="juice tab">
+      <div data-tab="client" class="juice tab">
         <i class="fas fa-cog"></i>
-        Miscellaneous
+        Client
       </div>
       <div data-tab="scripts" class="juice tab">
         <i class="fas fa-file-code"></i>
@@ -777,7 +797,7 @@
       <span class="sep"></span>
       <div class="bottom">
         <span class="ver"></span>
-        <span class="restart">Requires Restart</span>
+        <span class="user"></span>
       </div>
     </div>
   </aside>
@@ -806,7 +826,7 @@
         <div class="option dropdown">
           <div class="top">
             <i class="fas fa-angle-down"></i>
-            <span>Advanced CSS</span>
+            <span>Quick CSS</span>
           </div>
           <div class="content">
             <textarea
@@ -871,20 +891,26 @@
       </div>
       <div class="option-group">
         <div class="option">
-          <span>Hide Lobby Keybind Reminder</span>
+          <div class="left">
+            <span>Lobby Keybind Reminder</span>
+            <div class="description">Display the lobby keybind reminder</div>
+          </div>
           <div class="checkbox">
             <input
               type="checkbox"
-              id="hide_keybind_reminder"
-              data-setting="hide_keybind_reminder"
+              id="lobby_keybind_reminder"
+              data-setting="lobby_keybind_reminder"
             />
-            <label for="hide_keybind_reminder"></label>
+            <label for="lobby_keybind_reminder"></label>
           </div>
         </div>
       </div>
       <div class="option-group">
         <div class="option">
-          <span>Badges and Gradient Names</span>
+          <div class="left">
+            <span>Badges and Gradient Names</span>
+            <div class="description">Display user customizations</div>
+          </div>
           <div class="checkbox">
             <input
               type="checkbox"
@@ -999,10 +1025,15 @@
         </div>
       </div>
     </div>
-    <div id="misc-options" class="juice options">
+    <div id="client-options" class="juice options">
       <div class="option-group">
         <div class="option requires-restart">
-          <span>Discord RPC</span>
+          <div class="left">
+            <span>Discord Activity</span>
+            <span class="description">
+              Display Juice Client as your Discord activity
+            </span>
+          </div>
           <div class="checkbox">
             <input
               type="checkbox"
@@ -1013,13 +1044,18 @@
           </div>
         </div>
         <div class="option custom">
-          <span>Menu Toggle Keybind</span>
+          <div class="left">
+            <span>Menu Toggle Keybind</span>
+            <span class="description">
+              Customizable keybind to toggle the menu
+            </span>
+          </div>
           <button class="juice change-keybind"></button>
         </div>
       </div>
       <div class="option-group">
         <div class="option">
-          <div class="left">
+          <div class="left requires-refresh">
             <span>General News</span>
             <span class="description">Juice-related news</span>
           </div>
@@ -1033,7 +1069,7 @@
           </div>
         </div>
         <div class="option">
-          <div class="left">
+          <div class="left requires-refresh">
             <span>Promotional News</span>
             <span class="description"
               >Live events (has a "LIVE" indicator)</span
@@ -1049,7 +1085,7 @@
           </div>
         </div>
         <div class="option">
-          <div class="left">
+          <div class="left requires-refresh">
             <span>Event News</span>
             <span class="description">Events that you can participate in</span>
           </div>
@@ -1059,7 +1095,7 @@
           </div>
         </div>
         <div class="option">
-          <div class="left">
+          <div class="left requires-refresh">
             <span>Alerts</span>
             <span class="description"
               >Important alerts mainly posted by Kirka Staff</span
@@ -1089,7 +1125,7 @@
         </div>
       </div>
       <div class="option-group">
-        <div class="option">
+        <div class="option requires-refresh">
           <span>Proxy URL</span>
           <select id="base_url" data-setting="base_url">
             <option value="https://kirka.io/">kirka.io</option>
@@ -1097,7 +1133,9 @@
             <option value="https://snipers.io/">snipers.io</option>
             <option value="https://ask101math.com/">ask101math.com</option>
             <option value="https://fpsiogame.com/">fpsiogame.com</option>
-            <option value="https://cloudconverts.com/">cloudconverts.com</option>
+            <option value="https://cloudconverts.com/">
+              cloudconverts.com
+            </option>
           </select>
         </div>
       </div>
@@ -1130,7 +1168,10 @@
           </button>
         </div>
         <div class="option">
-          <button id="remote-to-static-links" class="juice-button large">
+          <button
+            id="remote-to-static-links"
+            class="juice-button large requires-refresh"
+          >
             <span class="test">Replace Remote Links with Static Links</span>
             <span class="description">
               This will speed up your customizations. This action cannot be
@@ -1144,7 +1185,10 @@
     <div id="scripts-options" class="juice options">
       <div class="option-group">
         <div class="option">
-          <span>Pack/Chest Opener</span>
+          <div class="left">
+            <span>Pack/Chest Opener</span>
+            <span class="description">Refresh to stop</span>
+          </div>
           <select id="opener">
             <option value="none">None</option>
             <option value="Chest_Golden">Golden</option>
@@ -1158,6 +1202,40 @@
             <option value="Card_Periodic">Periodic</option>
             <option value="Card_All">All Cards</option>
           </select>
+        </div>
+      </div>
+      <div class="option-group">
+        <div class="option">
+          <div class="left requires-refresh">
+            <span>Custom List Price</span>
+            <span class="description">
+              Allows you to set a custom price for items in the market
+            </span>
+          </div>
+          <div class="checkbox">
+            <input
+              type="checkbox"
+              id="custom_list_price"
+              data-setting="custom_list_price"
+            />
+            <label for="custom_list_price"></label>
+          </div>
+        </div>
+        <div class="option">
+          <div class="left requires-refresh">
+            <span>Market Names</span>
+            <span class="description"
+              >Displays seller Username and ID in the market</span
+            >
+          </div>
+          <div class="checkbox">
+            <input
+              type="checkbox"
+              id="market_names"
+              data-setting="market_names"
+            />
+            <label for="market_names"></label>
+          </div>
         </div>
       </div>
     </div>
@@ -1244,8 +1322,11 @@
             - CarrySheriff for Chest/Pack opener, Map Images Repo, Market Names,
             and Custom List Price
           </p>
-          <p>- Sam for a basic Resource Swapper</p>
+          <p>- AwesomeSam for a basic Resource Swapper</p>
           <p>- Error430 for optimizations</p>
+          <p>
+            - robertpakalns for various bug fixes, optimizations, and tweaks
+          </p>
         </div>
       </div>
     </div>

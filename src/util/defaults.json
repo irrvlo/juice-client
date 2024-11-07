@@ -6,7 +6,7 @@
     "ui_animations": true,
     "hide_chat": false,
     "hide_interface": false,
-    "hide_keybind_reminder": false,
+    "lobby_keybind_reminder": true,
     "skip_loading": false,
     "interface_opacity": "100",
     "interface_bounds": "2",
@@ -26,7 +26,9 @@
     "promotional_news": true,
     "event_news": true,
     "alert_news": true,
-    "base_url": "https://kirka.io/"
+    "base_url": "https://kirka.io/",
+    "market_names": false,
+    "custom_list_price": false
   },
   "allowed_urls": [
     "https://kirka.io/",

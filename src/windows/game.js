@@ -120,7 +120,8 @@ const createWindow = () => {
       const stateMap = {
         [`${base_url}`]: "In the lobby",
         [`${base_url}hub/leaderboard`]: "Viewing the leaderboard",
-        [`${base_url}hub/clans/champions-league`]: "Viewing the clan leaderboard",
+        [`${base_url}hub/clans/champions-league`]:
+          "Viewing the clan leaderboard",
         [`${base_url}hub/clans/my-clan`]: "Viewing their clan",
         [`${base_url}hub/market`]: "Viewing the market",
         [`${base_url}hub/live`]: "Viewing videos",
@@ -134,9 +135,9 @@ const createWindow = () => {
         [`${base_url}friends`]: "Viewing friends",
         [`${base_url}inventory`]: "Viewing their inventory",
       };
-      
+
       let state;
-      
+
       if (stateMap[url]) {
         state = stateMap[url];
       } else if (url.startsWith(`${base_url}games/`)) {
@@ -145,7 +146,7 @@ const createWindow = () => {
         state = "Viewing a profile";
       } else {
         state = "In the lobby";
-      }      
+      }
 
       gameWindow.DiscordRPC.setState(state);
     }
