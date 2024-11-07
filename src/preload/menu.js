@@ -54,14 +54,6 @@ class Menu {
           )
         )
       : this.handleTabChange(this.menu.querySelector(".juice.tab"));
-    this.closeModal();
-  }
-
-  closeModal() {
-    this.menu.querySelector("#juice-overlay").addEventListener("click", () => {
-      this.localStorage.setItem("juice-menu", false);
-      this.menuToggle.setAttribute("data-active", false);
-    })
   }
 
   setVersion() {
