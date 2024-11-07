@@ -215,7 +215,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       addContent();
 
       div.onclick = () => {
-        console.log("click");
         if (newsItem.link) {
           if (newsItem.link.startsWith("https://kirka.io/"))
             window.location.href = newsItem.link;

@@ -238,6 +238,7 @@
   }
   .menu[data-active="true"] {
     display: grid;
+    animation: hop 0.5s forwards;
   }
   .menu .checkbox {
     position: relative;
@@ -755,8 +756,30 @@
   #modal .close:hover {
     color: rgba(var(--light));
   }
+
+  #juice-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: calc(100vh + 100px);
+    background: rgba(0, 0, 0, 0.45);
+    z-index: -1;
+  }
+
+  @keyframes hop {
+    0% {
+        transform: translateY(30px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+  }
 </style>
 <div class="menu" data-theme="dark" data-active="true">
+  <div id="juice-overlay"></div>
   <aside class="sidebar">
     <div class="search-input">
       <i class="fas fa-search"></i>
