@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       width: 226px;
       position: absolute;
       display: flex;
+      flex-direction: column;
       top: 178px;
       left: 148px;
       pointer-events: auto;
@@ -334,8 +335,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           settings.interface_bounds === "1"
             ? 0.9
             : settings.interface_bounds === "0"
-              ? 0.8
-              : 1;
+            ? 0.8
+            : 1;
         styles.push(
           `.desktop-game-interface { transform: scale(${scale}) !important; }`
         );
@@ -349,8 +350,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (settings.killicon_link !== "")
         styles.push(`.animate-cont::before { content: ""; 
       background: url(${formatLink(
-          settings.killicon_link
-        )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
+        settings.killicon_link
+      )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
       .animate-cont svg { display: none; }`);
       if (!settings.ui_animations)
         styles.push(
@@ -408,12 +409,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (customs.gradient)
           lobbyNickname.style = `
               display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
-              background: linear-gradient(${customs.gradient.rot
-            }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
-            } !important;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
           `;
         else
           lobbyNickname.style =
@@ -687,12 +690,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (customs.gradient) {
               nickname.querySelector(".nickname-span").style.cssText += `
-              background: linear-gradient(${customs.gradient.rot
-                }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
-                } !important;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
             `;
             }
 
@@ -846,12 +851,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (customs.gradient) {
               nickname.style = `
               overflow: unset;
-              background: linear-gradient(${customs.gradient.rot
-                }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
-                } !important;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
               font-weight: 700 !important;
             `;
             } else {
@@ -997,24 +1004,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         denyRequests.innerHTML = `
           <span style="margin-bottom: .5rem; font-size: 1rem; font-weight: 600; color: #f2f2f2;">Deny Requests</span>
           <div style="display: flex; gap: 0.25rem; width: 100%;">
-            <button class="deny-button text-2" style="cursor: pointer; padding: 1rem 0; color: white; width: 100%; height: 2.875rem; display: flex; justify-content: center; align-items: center; font-family: Rowdies; font-size: 0.9rem; background: #e73131; border-top: 4px solid #e24f4f; border-bottom: 4px solid #cb1414; border-left: 0px; border-right: 0px;">DENY ALL REQUESTS</button>
-            <button class="deny-reset text-2" style="cursor: pointer; padding: 1rem 0; color: white; width: 100%; height: 2.875rem; display: none; justify-content: center; align-items: center; font-family: Rowdies; font-size: 0.9rem; background: #ffb914; border-top: 4px solid #fcd373; border-bottom: 4px solid #b6830e; border-left: 0px; border-right: 0px;">BACK</button>
+            <button class="deny-button text-2" style="cursor: pointer; outline: none; padding: 1rem 0; color: white; width: 100%; height: 2.875rem; display: flex; justify-content: center; align-items: center; font-family: Rowdies; font-size: 0.9rem; background: #e73131; border: 4px solid #e73131; border-top: 4px solid #e24f4f; border-bottom: 4px solid #cb1414;">DENY ALL REQUESTS</button>
+            <button class="deny-reset text-2" style="cursor: pointer; outline: none; padding: 1rem 0; color: white; width: 100%; height: 2.875rem; display: none; justify-content: center; align-items: center; font-family: Rowdies; font-size: 0.9rem; background: #ffb914; border: 4px solid #ffb914; border-top: 4px solid #fcd373; border-bottom: 4px solid #b6830e;">BACK</button>
           </div>`;
         addFriends.appendChild(denyRequests);
 
         const denyButton = denyRequests.querySelector(".deny-button");
         const denyReset = denyRequests.querySelector(".deny-reset");
-        let updating = false;
         let confirm = true;
+        let updating = false;
 
-        denyReset.addEventListener("click", () => {
+        const resetButtonState = () => {
           denyButton.innerText = "DENY ALL REQUESTS";
           denyReset.style.display = "none";
           confirm = true;
-        });
+          updating = false;
+        };
 
-        denyButton.addEventListener("click", async () => {
-          if (updating || !document.querySelector(".allo > .requests")) return;
+        const handleDenyReset = () => resetButtonState();
+
+        const handleDenyButtonClick = () => {
+          if (updating || !document.querySelector(".allo > .requests"))
+            return resetButtonState();
 
           if (confirm) {
             denyButton.innerText = "ARE YOU SURE?";
@@ -1024,32 +1035,32 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
           updating = true;
-          denyButton.innerText = "DENYING...";
+          denyButton.innerText = "CANCEL";
           denyReset.style.display = "none";
 
-          await fetch(`https://api.kirka.io/api/user`, {
-            headers: {
-              accept: "application/json, text/plain, */*",
-              authorization: `Bearer ${localStorage.getItem("token")}`,
-              "content-type": "application/json;charset=UTF-8"
-            }
-          })
-            .then(r => r.json())
-            .then(async data => await data.friendRequests.forEach(({ id }) => fetch(`https://api.kirka.io/api/user/cancelFriendship`, {
-              headers: {
-                accept: "application/json, text/plain, */*",
-                authorization: `Bearer ${localStorage.getItem("token")}`,
-                "content-type": "application/json;charset=UTF-8",
-              },
-              body: `{"userId":"${id}"}`,
-              method: "POST"
-            })))
+          const requests = document.querySelectorAll(".requests .friend");
+          requests.forEach((request, index) => {
+            setTimeout(() => {
+              if (!document.querySelector(".allo > .requests"))
+                return resetButtonState();
+              if (!updating) return;
 
-          window.location.reload()
-          // denyButton.innerText = "DENY ALL REQUESTS";
-        });
+              const deleteButton = request.querySelector(".delete");
+              if (deleteButton) deleteButton.click();
+
+              if (index === requests.length - 1) {
+                resetButtonState();
+                customNotification({
+                  message: "All friend requests have been denied.",
+                });
+              }
+            }, index * 500);
+          });
+        };
+
+        denyReset.addEventListener("click", handleDenyReset);
+        denyButton.addEventListener("click", handleDenyButtonClick);
       }
-
 
       if (!addFriends.querySelector(".search-friends")) createSearch();
       if (!addFriends.querySelector(".deny-requests")) createDenyButton();
@@ -1091,12 +1102,14 @@ document.addEventListener("DOMContentLoaded", async () => {
               gap: 0.25rem !important;
               max-width: min-width !important;
               flex-direction: row !important;
-              background: linear-gradient(${customs.gradient.rot
-                }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${
+                customs.gradient.rot
+              }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
-                } !important;
+              text-shadow: ${
+                customs.gradient.shadow || "0 0 0 transparent"
+              } !important;
               font-weight: 700 !important;
             `;
 
@@ -1162,7 +1175,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         margin-left: 1rem;
         border: solid .15rem #ffb914;
         font-family: Exo\ 2;" class="alert-default"
-    > ${data.icon
+    > ${
+      data.icon
         ? `
         <img
           src="${data.icon}"
@@ -1172,8 +1186,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             margin-right: .9rem;"
         />`
         : ""
-      }
-      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${data.message
+    }
+      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${
+        data.message
       }</span>
     </div>`;
 
@@ -1184,7 +1199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => {
       try {
         notifElement.remove();
-      } catch { }
+      } catch {}
     }, 5000);
   };
 
