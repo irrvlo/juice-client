@@ -24,5 +24,8 @@
     "electron-store": "^8.2.0",
     "electron-updater": "^6.2.1",
     "v8-compile-cache": "^2.4.0"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   }
 }
