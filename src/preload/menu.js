@@ -1,7 +1,7 @@
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
-const version = require("../../package.json").version;
+const { version } = require("../../package.json");
 
 class Menu {
   constructor() {
@@ -64,7 +64,6 @@ class Menu {
 
   setUser() {
     const user = JSON.parse(this.localStorage.getItem("current-user"));
-    console.log(user);
     if (user) {
       this.menu.querySelector(".user").innerText = `${user.name}#${user.shortId}`;
     }

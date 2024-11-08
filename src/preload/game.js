@@ -215,7 +215,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       addContent();
 
       div.onclick = () => {
-        console.log("click");
         if (newsItem.link) {
           if (newsItem.link.startsWith("https://kirka.io/"))
             window.location.href = newsItem.link;
@@ -335,8 +334,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           settings.interface_bounds === "1"
             ? 0.9
             : settings.interface_bounds === "0"
-            ? 0.8
-            : 1;
+              ? 0.8
+              : 1;
         styles.push(
           `.desktop-game-interface { transform: scale(${scale}) !important; }`
         );
@@ -350,8 +349,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (settings.killicon_link !== "")
         styles.push(`.animate-cont::before { content: ""; 
       background: url(${formatLink(
-        settings.killicon_link
-      )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
+          settings.killicon_link
+        )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
       .animate-cont svg { display: none; }`);
       if (!settings.ui_animations)
         styles.push(
@@ -409,14 +408,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (customs.gradient)
           lobbyNickname.style = `
               display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+            }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+            } !important;
           `;
         else
           lobbyNickname.style =
@@ -690,14 +687,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (customs.gradient) {
               nickname.querySelector(".nickname-span").style.cssText += `
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
             `;
             }
 
@@ -851,14 +846,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (customs.gradient) {
               nickname.style = `
               overflow: unset;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
               font-weight: 700 !important;
             `;
             } else {
@@ -1008,7 +1001,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <button class="deny-reset text-2" style="cursor: pointer; padding: 1rem 0; color: white; width: 100%; height: 2.875rem; display: none; justify-content: center; align-items: center; font-family: Rowdies; font-size: 0.9rem; background: #ffb914; border-top: 4px solid #fcd373; border-bottom: 4px solid #b6830e; border-left: 0px; border-right: 0px;">BACK</button>
           </div>`;
         addFriends.appendChild(denyRequests);
-      
+
         const denyButton = denyRequests.querySelector(".deny-button");
         const denyReset = denyRequests.querySelector(".deny-reset");
         let updating = false;
@@ -1019,43 +1012,44 @@ document.addEventListener("DOMContentLoaded", async () => {
           denyReset.style.display = "none";
           confirm = true;
         });
-      
-        denyButton.addEventListener("click", () => {
+
+        denyButton.addEventListener("click", async () => {
           if (updating || !document.querySelector(".allo > .requests")) return;
-      
+
           if (confirm) {
             denyButton.innerText = "ARE YOU SURE?";
             denyReset.style.display = "flex";
             confirm = false;
             return;
           }
-      
+
           updating = true;
           denyButton.innerText = "DENYING...";
           denyReset.style.display = "none";
-      
-          const requests = document.querySelectorAll(".allo > .requests .friend");
-          requests.forEach((request, i) => {
-            const deleteButton = request.querySelector(".delete");
-            setTimeout(() => {
-              if (document.querySelector(".allo > .requests")) {
-                deleteButton.click();
-              } else {
-                updating = false;
-                confirm = true;
-                denyButton.innerText = "DENY ALL REQUESTS";
-                return;
-              }
-              if (i === requests.length - 1) {
-                updating = false;
-                confirm = true;
-                denyButton.innerText = "DENY ALL REQUESTS";
-              }
-            }, i * 200);
-          });
+
+          await fetch(`https://api.kirka.io/api/user`, {
+            headers: {
+              accept: "application/json, text/plain, */*",
+              authorization: `Bearer ${localStorage.getItem("token")}`,
+              "content-type": "application/json;charset=UTF-8"
+            }
+          })
+            .then(r => r.json())
+            .then(async data => await data.friendRequests.forEach(({ id }) => fetch(`https://api.kirka.io/api/user/cancelFriendship`, {
+              headers: {
+                accept: "application/json, text/plain, */*",
+                authorization: `Bearer ${localStorage.getItem("token")}`,
+                "content-type": "application/json;charset=UTF-8",
+              },
+              body: `{"userId":"${id}"}`,
+              method: "POST"
+            })))
+
+          window.location.reload()
+          // denyButton.innerText = "DENY ALL REQUESTS";
         });
       }
-      
+
 
       if (!addFriends.querySelector(".search-friends")) createSearch();
       if (!addFriends.querySelector(".deny-requests")) createDenyButton();
@@ -1097,14 +1091,12 @@ document.addEventListener("DOMContentLoaded", async () => {
               gap: 0.25rem !important;
               max-width: min-width !important;
               flex-direction: row !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
               font-weight: 700 !important;
             `;
 
@@ -1170,8 +1162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         margin-left: 1rem;
         border: solid .15rem #ffb914;
         font-family: Exo\ 2;" class="alert-default"
-    > ${
-      data.icon
+    > ${data.icon
         ? `
         <img
           src="${data.icon}"
@@ -1181,9 +1172,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             margin-right: .9rem;"
         />`
         : ""
-    }
-      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${
-        data.message
+      }
+      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${data.message
       }</span>
     </div>`;
 
@@ -1194,7 +1184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => {
       try {
         notifElement.remove();
-      } catch {}
+      } catch { }
     }, 5000);
   };
 
