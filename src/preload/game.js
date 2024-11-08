@@ -1045,7 +1045,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           let index = 0;
 
           denyInterval = setInterval(() => {
-            console.log(index, requests.length);
             if (!document.querySelector(".allo > .requests") && updating) return resetButtonState();
             if (!updating) return clearInterval(denyInterval);
       
