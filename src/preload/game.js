@@ -1014,12 +1014,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const denyReset = denyRequests.querySelector(".deny-reset");
         let confirm = true;
         let updating = false;
+        let denyInterval;
 
         const resetButtonState = () => {
           denyButton.innerText = "DENY ALL REQUESTS";
           denyReset.style.display = "none";
           confirm = true;
           updating = false;
+          clearInterval(denyInterval);
         };
 
         const handleDenyReset = () => resetButtonState();
@@ -1040,23 +1042,24 @@ document.addEventListener("DOMContentLoaded", async () => {
           denyReset.style.display = "none";
 
           const requests = document.querySelectorAll(".requests .friend");
-          requests.forEach((request, index) => {
-            setTimeout(() => {
-              if (!document.querySelector(".allo > .requests"))
-                return resetButtonState();
-              if (!updating) return;
+          let index = 0;
 
-              const deleteButton = request.querySelector(".delete");
-              if (deleteButton) deleteButton.click();
-
-              if (index === requests.length - 1) {
-                resetButtonState();
-                customNotification({
-                  message: "All friend requests have been denied.",
-                });
-              }
-            }, index * 500);
-          });
+          denyInterval = setInterval(() => {
+            console.log(index, requests.length);
+            if (!document.querySelector(".allo > .requests") && updating) return resetButtonState();
+            if (!updating) return clearInterval(denyInterval);
+      
+            const request = requests[index];
+            const deleteButton = request?.querySelector(".delete");
+      
+            if (deleteButton) deleteButton.click();
+            index++;
+      
+            if (index >= requests.length) {
+              resetButtonState();
+              customNotification({ message: "All friend requests have been denied." });
+            }
+          }, 500);
         };
 
         denyReset.addEventListener("click", handleDenyReset);
