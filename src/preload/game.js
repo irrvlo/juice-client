@@ -110,10 +110,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     lobbyNewsContainer.id = "lobby-news";
     lobbyNewsContainer.className = "lobby-news";
     lobbyNewsContainer.style = `
-      width: 226px;
+      width: 250px;
       position: absolute;
       display: flex;
       flex-direction: column;
+      gap: 0.25rem;
       top: 178px;
       left: 148px;
       pointer-events: auto;
