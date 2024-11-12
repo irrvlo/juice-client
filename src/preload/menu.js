@@ -6,6 +6,10 @@ const { version } = require("../../package.json");
 class Menu {
   constructor() {
     this.settings = ipcRenderer.sendSync("get-settings");
+    this.menuCSS = fs.readFileSync(
+      path.join(__dirname, "../assets/css/menu.css"),
+      "utf8"
+    );
     this.menuHTML = fs.readFileSync(
       path.join(__dirname, "../assets/html/menu.html"),
       "utf8"
@@ -29,6 +33,9 @@ class Menu {
     menu.id = "juice-menu";
     menu.style.cssText =
       "z-index: 99999999; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);";
+	const menuCSS = document.createElement("style");
+	menuCSS.innerHTML = this.menuCSS
+	menu.prepend(menuCSS);
     document.body.appendChild(menu);
     return menu;
   }
