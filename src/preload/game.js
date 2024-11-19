@@ -23,6 +23,11 @@ if (!window.location.href.startsWith(base_url)) {
   return;
 }
 
+const _write = document.write
+document.write = function (el) {
+  return el.includes("adinplay.com") || _write.call(this, el)
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const menu = new Menu();
   menu.init();
