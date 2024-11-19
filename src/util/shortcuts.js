@@ -2,6 +2,7 @@ const { app, clipboard, screen } = require("electron");
 const shortcut = require("electron-localshortcut");
 const Store = require("electron-store");
 const store = new Store();
+const { initResourceSwapper } = require("../addons/swapper");
 
 const registerShortcuts = (window) => {
   const register = (key, action) => shortcut.register(window, key, action);
@@ -18,9 +19,18 @@ const registerShortcuts = (window) => {
       });
     });
   });
-  register("F4", () => window.loadURL(store.get("settings").base_url));
-  register("F5", () => window.reload());
-  register("F6", () => window.loadURL(clipboard.readText()));
+  register("F4", () => {
+    window.loadURL(store.get("settings").base_url);
+    initResourceSwapper();
+  });
+  register("F5", () => {
+    window.reload();
+    initResourceSwapper();
+  });
+  register("F6", () => {
+    window.loadURL(clipboard.readText());
+    initResourceSwapper();
+  });
   register("F7", () => clipboard.writeText(window.webContents.getURL()));
   register("F11", () => window.setFullScreen(!window.isFullScreen()));
   register("F12", () => window.webContents.toggleDevTools());
