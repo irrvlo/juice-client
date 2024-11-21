@@ -58,12 +58,13 @@ const initResourceSwapper = () => {
         if (!useAssets) return;
 
         proxyUrls.forEach((proxy) => {
-          const kirk =
-            `*://${proxy}` +
-            filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/") +
-            "*";
-          swap.filter.urls.push(kirk);
-          swap.files[kirk.replace(/\*/g, "")] = url.format({
+          const kirk = `*://${proxy}${filePath.replace(SWAP_FOLDER, "").replace(/\\/g, "/")}*`;
+          const origfilterurl = kirk.match(/\/[^\/]+\.(?:[a-zA-Z0-9]+)\*/gi)[0];
+          let filterurl = origfilterurl.replace(/\_/g, "");
+          filterurl = filterurl.replace("/", "/*");
+          filterurl = filterurl.replace(".", "*.*");
+          swap.filter.urls.push(kirk.replace(origfilterurl, filterurl));
+          swap.files[kirk.replace(/\*|_/g, "")] = url.format({
             pathname: filePath,
             protocol: "",
             slashes: false,
@@ -81,7 +82,7 @@ const initResourceSwapper = () => {
       (details, callback) => {
         const redirect =
           "juiceclient://" +
-          (swap.files[details.url.replace(/https|http|(\?.*)|(#.*)/gi, "")] ||
+          (swap.files[details.url.replace(/https|http|(\?.*)|(#.*)|\_/gi, "")] ||
             details.url);
         callback({ cancel: false, redirectURL: redirect });
       }
