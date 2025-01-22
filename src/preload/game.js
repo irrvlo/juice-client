@@ -553,7 +553,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const handleServers = async () => {
     const mapImages = await fetch(
-      "https://raw.githubusercontent.com/SheriffCarry/KirkaSkins/main/maps/full_mapimages.json"
+      "https://raw.githubusercontent.com/SheriffCarry-backup/KirkaSkins/refs/heads/main/maps/full_mapimages.json"
     ).then((res) => res.json());
 
     const replaceMapImages = () => {
