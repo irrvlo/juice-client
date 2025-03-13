@@ -11,21 +11,16 @@ const scripts = fs.readdirSync(scriptsPath);
 const settings = ipcRenderer.sendSync("get-settings");
 const base_url = settings.base_url;
 
-scripts.forEach((script) => {
-  if (!script.endsWith(".js")) return;
-  const scriptPath = path.join(scriptsPath, script);
-  require(scriptPath);
-});
-
 if (!window.location.href.startsWith(base_url)) {
   delete window.process;
   delete window.require;
   return;
-}
-
-const _write = document.write
-document.write = function (el) {
-  return el.includes("adinplay.com") || _write.call(this, el)
+} else {
+  scripts.forEach((script) => {
+    if (!script.endsWith(".js")) return;
+    const scriptPath = path.join(scriptsPath, script);
+    require(scriptPath);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -341,8 +336,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           settings.interface_bounds === "1"
             ? 0.9
             : settings.interface_bounds === "0"
-            ? 0.8
-            : 1;
+              ? 0.8
+              : 1;
         styles.push(
           `.desktop-game-interface { transform: scale(${scale}) !important; }`
         );
@@ -356,8 +351,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (settings.killicon_link !== "")
         styles.push(`.animate-cont::before { content: ""; 
       background: url(${formatLink(
-        settings.killicon_link
-      )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
+          settings.killicon_link
+        )}); width: 10rem; height: 10rem; margin-bottom: 2rem; display: inline-block; background-position: center; background-size: contain; background-repeat: no-repeat; }
       .animate-cont svg { display: none; }`);
       if (!settings.ui_animations)
         styles.push(
@@ -415,14 +410,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (customs.gradient)
           lobbyNickname.style = `
               display: flex; align-items: flex-end; gap: 0.25rem; overflow: unset !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+            }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+            } !important;
           `;
         else
           lobbyNickname.style =
@@ -696,14 +689,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (customs.gradient) {
               nickname.querySelector(".nickname-span").style.cssText += `
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")});
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")});
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
             `;
             }
 
@@ -760,17 +751,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const updateKD = () => {
       const kills = document.querySelector(".kill-death .kill");
-      const deaths = document.querySelector(
-        "div > svg.icon-death"
-      ).parentElement;
+      const deaths = document.querySelector("div > svg.icon-death")?.parentElement;
       const kd = document.querySelector(".kill-death .kd");
+
+      if (!kills || !deaths || !kd) return;
 
       const killCount = parseFloat(kills.innerText);
       const deathCount = parseFloat(deaths.innerText) || 1;
-
       let kdRatio = (killCount / deathCount).toFixed(2);
-
-      kdRatio = parseFloat(kdRatio).toString();
 
       kd.innerHTML = `<span class="kd-ratio">${kdRatio}</span> <span class="text-kd" style="font-size: 0.75rem;">K/D</span>`;
     };
@@ -778,9 +766,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const createKD = () => {
       if (document.querySelector(".kill-death .kd")) return;
       const kills = document.querySelector(".kill-death .kill");
-      const deaths = document.querySelector(
-        "div > svg.icon-death"
-      )?.parentElement;
+      const deaths = document.querySelector("div > svg.icon-death")?.parentElement;
       const kd = kills?.cloneNode(true);
 
       if (!kd) return;
@@ -797,31 +783,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     document.addEventListener("juice-settings-changed", ({ detail }) => {
-      if (detail.setting === "kd_indicator")
-        settings.kd_indicator = detail.value;
-      else if (detail.setting === "customizations")
-        settings.customizations = detail.value;
+      if (detail.setting === "kd_indicator") settings.kd_indicator = detail.value;
+      else if (detail.setting === "customizations") settings.customizations = detail.value;
     });
 
-    const customizations = JSON.parse(
-      localStorage.getItem("juice-customizations")
-    );
+    const customizations = JSON.parse(localStorage.getItem("juice-customizations"));
 
     const interval = setInterval(() => {
-      if (!window.location.href.startsWith(`${base_url}games/`))
+      if (!document.querySelector(".desktop-game-interface")) {
         clearInterval(interval);
+        return;
+      }
 
-      const tabplayers = document.querySelectorAll(
-        ".desktop-game-interface .player-cont"
-      );
+      const tabplayers = document.querySelectorAll(".desktop-game-interface .player-cont");
 
       if (settings.customizations) {
         tabplayers.forEach((player) => {
           const playerLeft = player.querySelector(".player-left");
           const nickname = player.querySelector(".nickname");
-          const shortId = player
-            .querySelector(".short-id")
-            ?.innerText.replace("#", "");
+          const shortId = player.querySelector(".short-id")?.innerText.replace("#", "");
 
           if (!shortId) {
             player.querySelector(".juice-badges")?.remove();
@@ -836,62 +816,48 @@ document.addEventListener("DOMContentLoaded", async () => {
             let badgesElem = player.querySelector(".juice-badges");
 
             if (!badgesElem || badgesElem.dataset.shortId !== shortId) {
-              if (badgesElem) {
-                badgesElem.remove();
-              }
+              badgesElem?.remove();
               badgesElem = document.createElement("div");
-              badgesElem.style =
-                "display: flex; gap: 0.25rem; align-items: center; margin-left: 0.25rem;";
+              badgesElem.style = "display: flex; gap: 0.25rem; align-items: center; margin-left: 0.25rem;";
               badgesElem.className = "juice-badges";
               badgesElem.dataset.shortId = shortId;
 
               nickname.style = "overflow: unset;";
               playerLeft.style = "width: 0;";
               playerLeft.insertBefore(badgesElem, playerLeft.lastChild);
-            } else if (badgesElem.dataset.shortId === shortId) {
-              return;
+            } else {
+              badgesElem.innerHTML = "";
             }
 
             const badgeStyle = "height: 22px; width: auto;";
 
             if (customs.gradient) {
               nickname.style = `
-              overflow: unset;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
-              -webkit-background-clip: text !important;
-              -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
-              font-weight: 700 !important;
-            `;
+                  overflow: unset;
+                  background: linear-gradient(${customs.gradient.rot}, ${customs.gradient.stops.join(", ")}) !important;
+                  -webkit-background-clip: text !important;
+                  -webkit-text-fill-color: transparent !important;
+                  text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"} !important;
+                  font-weight: 700 !important;
+                `;
             } else {
               nickname.style = "overflow: unset;";
             }
 
-            if (customs.discord) {
-              const linkedBadge = document.createElement("img");
-              linkedBadge.src = "https://juice.irrvlo.xyz/linked.png";
-              linkedBadge.style.cssText = badgeStyle;
-              badgesElem.appendChild(linkedBadge);
-            }
-
-            if (customs.booster) {
-              const boosterBadge = document.createElement("img");
-              boosterBadge.src = "https://juice.irrvlo.xyz/booster.png";
-              boosterBadge.style.cssText = badgeStyle;
-              badgesElem.appendChild(boosterBadge);
-            }
-
-            if (customs.badges && customs.badges.length) {
-              customs.badges.forEach((badge) => {
+            const addBadge = (src) => {
+              if (![...badgesElem.children].some(img => img.src === src)) {
                 const img = document.createElement("img");
-                img.src = badge;
+                img.src = src;
                 img.style.cssText = badgeStyle;
                 badgesElem.appendChild(img);
-              });
+              }
+            };
+
+            if (customs.discord) addBadge("https://juice.irrvlo.xyz/linked.png");
+            if (customs.booster) addBadge("https://juice.irrvlo.xyz/booster.png");
+
+            if (customs.badges?.length) {
+              customs.badges.forEach((badge) => addBadge(badge));
             }
           } else {
             playerLeft.querySelector(".juice-badges")?.remove();
@@ -909,10 +875,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (!document.querySelector(".kill-death .kd") && settings.kd_indicator) {
         createKD();
-      } else if (
-        document.querySelector(".kill-death .kd") &&
-        !settings.kd_indicator
-      ) {
+      } else if (document.querySelector(".kill-death .kd") && !settings.kd_indicator) {
         document.querySelector(".kill-death .kd").remove();
       }
     }, 1000);
@@ -1052,13 +1015,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           denyInterval = setInterval(() => {
             if (!document.querySelector(".allo > .requests") && updating) return resetButtonState();
             if (!updating) return clearInterval(denyInterval);
-      
+
             const request = requests[index];
             const deleteButton = request?.querySelector(".delete");
-      
+
             if (deleteButton) deleteButton.click();
             index++;
-      
+
             if (index >= requests.length) {
               resetButtonState();
               customNotification({ message: "All friend requests have been denied." });
@@ -1110,14 +1073,12 @@ document.addEventListener("DOMContentLoaded", async () => {
               gap: 0.25rem !important;
               max-width: min-width !important;
               flex-direction: row !important;
-              background: linear-gradient(${
-                customs.gradient.rot
-              }, ${customs.gradient.stops.join(", ")}) !important;
+              background: linear-gradient(${customs.gradient.rot
+                }, ${customs.gradient.stops.join(", ")}) !important;
               -webkit-background-clip: text !important;
               -webkit-text-fill-color: transparent !important;
-              text-shadow: ${
-                customs.gradient.shadow || "0 0 0 transparent"
-              } !important;
+              text-shadow: ${customs.gradient.shadow || "0 0 0 transparent"
+                } !important;
               font-weight: 700 !important;
             `;
 
@@ -1183,8 +1144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         margin-left: 1rem;
         border: solid .15rem #ffb914;
         font-family: Exo\ 2;" class="alert-default"
-    > ${
-      data.icon
+    > ${data.icon
         ? `
         <img
           src="${data.icon}"
@@ -1194,9 +1154,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             margin-right: .9rem;"
         />`
         : ""
-    }
-      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${
-        data.message
+      }
+      <span style="font-size: 1rem; font-weight: 600; text-align: left;" class="text">${data.message
       }</span>
     </div>`;
 
@@ -1207,27 +1166,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(() => {
       try {
         notifElement.remove();
-      } catch {}
+      } catch { }
     }, 5000);
   };
 
   ipcRenderer.on("notification", (_, data) => customNotification(data));
 
   ipcRenderer.on("url-change", (_, url) => {
-    if (url === `${base_url}`) handleLobby();
+    if (url === `${base_url}`) {
+      handleLobby();
+      handleInGame();
+    }
+    if (url.startsWith(`${base_url}games`)) handleInGame();
     if (url.startsWith(`${base_url}servers/`)) handleServers();
     if (url.startsWith(`${base_url}profile/`)) handleProfile();
-    if (url.startsWith(`${base_url}games/`)) handleInGame();
     if (url === `${base_url}hub/market`) handleMarket();
     if (url === `${base_url}friends`) handleFriends();
   });
 
   const handleInitialLoad = () => {
     const url = window.location.href;
-    if (url.startsWith(`${base_url}`) && !url.includes("games")) handleLobby();
+    if (url === `${base_url}`) {
+      handleLobby();
+      handleInGame();
+    }
+    if (url.startsWith(`${base_url}games`)) handleInGame();
     if (url.startsWith(`${base_url}servers/`)) handleServers();
     if (url.startsWith(`${base_url}profile/`)) handleProfile();
-    if (url.startsWith(`${base_url}games/`)) handleInGame();
     if (url === `${base_url}hub/market`) handleMarket();
     if (url === `${base_url}friends`) handleFriends();
 

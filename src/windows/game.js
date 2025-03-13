@@ -89,7 +89,6 @@ const createWindow = () => {
       nodeIntegration: true,
       contextIsolation: false,
       webSecurity: false,
-      enableRemoteModule: true,
       preload: path.join(__dirname, "../preload/game.js"),
     },
   });
@@ -154,7 +153,7 @@ const createWindow = () => {
 
   gameWindow.loadURL(settings.base_url);
   gameWindow.webContents.setUserAgent(
-    `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Electron/10.4.7 JuiceClient/${app.getVersion()}`
+    `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Electron/10.4.7 JuiceClient/${app.getVersion()}`
   );
   gameWindow.removeMenu();
   gameWindow.maximize();

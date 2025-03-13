@@ -1,33 +1,26 @@
+let git_base = "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/"
 async function start_chests_input(inputarray) {
   let customchestlist = inputarray;
-  let response = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/ConsoleScripts/Open%20All%20Chests.js"
-  );
+  let response = await fetch(`${git_base}ConsoleScripts/Open%20All%20Chests.js`);
   let text = await response.text();
   eval(text);
 }
 
 async function start_chests() {
-  let response = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/ConsoleScripts/Open%20All%20Chests.js"
-  );
+  let response = await fetch(`${git_base}ConsoleScripts/Open%20All%20Chests.js`);
   let text = await response.text();
   eval(text);
 }
 
 async function start_cards_input(inputarray) {
   let customcardlist = inputarray;
-  let response = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/ConsoleScripts/Open%20All%20Cards.js"
-  );
+  let response = await fetch(`${git_base}ConsoleScripts/Open%20All%20Cards.js`);
   let text = await response.text();
   eval(text);
 }
 
 async function start_cards() {
-  let response = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/ConsoleScripts/Open%20All%20Cards.js"
-  );
+  let response = await fetch(`${git_base}ConsoleScripts/Open%20All%20Cards.js`);
   let text = await response.text();
   eval(text);
 }
