@@ -21,7 +21,9 @@ const createWindow = () => {
     show: false,
     frame: false,
     transparent: true,
+    fullscreenable: false,
     resizable: false,
+    fullscreenable: false,
     webPreferences: {
       preload: path.join(__dirname, "../preload/splash.js"),
     },
